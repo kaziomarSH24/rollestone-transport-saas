@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\Admin\CompanyController;
 use App\Http\Controllers\Api\V1\Admin\DriverController;
 use App\Http\Controllers\Api\V1\Admin\PassengerController;
@@ -91,7 +92,17 @@ Route::middleware('auth:sanctum', 'identify.company')->prefix('v1')->group(funct
         Route::get('/routes', [RoutesController::class, 'index'])->name('routes.index');
         Route::get('/routes/{id}', [RoutesController::class, 'show'])->name('routes.show');
     });
+
+    // --- Notification Routes ---
+    Route::prefix('notifications')->as('notifications.')->group(function () {
+
+        Route::get('/', [NotificationController::class, 'index'])->name('index');
+        Route::get('/stats', [NotificationController::class, 'stats'])->name('stats');
+        Route::post('/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->name('markAllAsRead');
+        Route::patch('/{notification}/read', [NotificationController::class, 'markAsRead'])->name('markAsRead');
+        Route::delete('/{notification}', [NotificationController::class, 'destroy'])->name('destroy');
+    });
 });
 
 // --- Webhook Routes ---
-Route::post('/v1/stripe/webhook', [WebhookController::class, 'handleStripeWebhook']);
+Route::post('/v1/stripe/webhook', [WebhookController::class, 'handleStripeWebhook'])->name('webhook.stripe');

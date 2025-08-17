@@ -91,6 +91,13 @@ class RolesAndPermissionsSeeder extends Seeder
             'Settings Management' => [
                 'manage settings',
             ],
+
+            'Message Management' => [
+                'send messages',
+                'view messages',
+                'edit messages',
+                'delete messages',
+            ],
         ];
 
         // Create Permissions

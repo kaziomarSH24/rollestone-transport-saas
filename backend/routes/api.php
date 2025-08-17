@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\Admin\CompanyController;
 use App\Http\Controllers\Api\V1\Admin\DriverController;
+use App\Http\Controllers\Api\V1\Admin\MessageController;
 use App\Http\Controllers\Api\V1\Admin\PassengerController;
 use App\Http\Controllers\Api\V1\Admin\RouteController;
 use App\Http\Controllers\Api\V1\Admin\SettingsController;
@@ -15,6 +17,7 @@ use App\Http\Controllers\Api\V1\Auth\VerificationController;
 use App\Http\Controllers\Api\V1\Passenger\PaymentController;
 use App\Http\Controllers\Api\V1\Passenger\RoutesController;
 use App\Http\Controllers\Api\V1\WebhookController;
+use App\Models\Message;
 
 // --- Public Routes (Authentication) ---
 Route::middleware('identify.company')->prefix('v1')->group(function () {
@@ -74,6 +77,11 @@ Route::middleware('auth:sanctum', 'identify.company')->prefix('v1')->group(funct
         Route::get('/settings', [SettingsController::class, 'getSettings']);
         Route::post('/settings', [SettingsController::class, 'saveSettings']);
         Route::post('/settings/test-stripe', [SettingsController::class, 'testStripeConnection']);
+
+        // Message Routes
+        Route::apiResource('messages', MessageController::class)->except(['create', 'edit']);
+        Route::get('messages/dashboard/stats', [MessageController::class, 'dashboardStats']);
+        // You can add more message-related routes
     });
 
 
@@ -91,7 +99,28 @@ Route::middleware('auth:sanctum', 'identify.company')->prefix('v1')->group(funct
         Route::get('/routes', [RoutesController::class, 'index'])->name('routes.index');
         Route::get('/routes/{id}', [RoutesController::class, 'show'])->name('routes.show');
     });
+
+    // --- Notification Routes ---
+    Route::prefix('notifications')->as('notifications.')->group(function () {
+
+        Route::get('/', [NotificationController::class, 'index'])->name('index');
+        Route::get('/stats', [NotificationController::class, 'stats'])->name('stats');
+        Route::post('/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->name('markAllAsRead');
+        Route::patch('/{notification}/read', [NotificationController::class, 'markAsRead'])->name('markAsRead');
+        Route::delete('/{notification}', [NotificationController::class, 'destroy'])->name('destroy');
+    });
 });
 
 // --- Webhook Routes ---
-Route::post('/v1/stripe/webhook', [WebhookController::class, 'handleStripeWebhook']);
+Route::post('/v1/stripe/webhook', [WebhookController::class, 'handleStripeWebhook'])->name('webhook.stripe');
+
+
+// test api route
+Route::get('/v1/test', function (Request $request) {
+    dd(now()->toDateTimeString());
+   return $messagesToSend = Message::where('status', 'scheduled')
+            ->where('scheduled_at', '<=', now())
+            ->get();
+
+
+})->name('api.v1.test');

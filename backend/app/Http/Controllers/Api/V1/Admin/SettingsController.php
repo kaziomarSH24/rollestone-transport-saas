@@ -21,6 +21,7 @@ class SettingsController extends Controller
     {
         try {
             $settings = $this->settingsService->getSettings();
+            $settings['webhook_endpoint'] = route('webhook.stripe'); // Add webhook URL to settings
             return response_success('Settings retrieved successfully.', $settings);
         } catch (\Exception $e) {
             return response_error('Failed to retrieve settings: ' . $e->getMessage(), [], 500);

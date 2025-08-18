@@ -16,10 +16,10 @@ class MessageController extends Controller
     {
         $this->messageService = $messageService;
         // Middleware for authorization
-        // $this->middleware('can:view messages')->only(['index', 'show']);
-        // $this->middleware('can:send messages')->only(['store']);
-        // $this->middleware('can:edit messages')->only(['update']);
-        // $this->middleware('can:delete messages')->only(['destroy']);
+        $this->middleware('can:view messages')->only(['index', 'show', 'dashboardStats']);
+        $this->middleware('can:send messages')->only(['store']);
+        $this->middleware('can:edit messages')->only(['update']);
+        $this->middleware('can:delete messages')->only(['destroy']);
     }
 
 
@@ -28,9 +28,6 @@ class MessageController extends Controller
     {
         try {
             $totalMessages = $this->messageService->getTotalMessagesCount();
-            if ($totalMessages === 0) {
-                return response_error('No messages found.', [], 404);
-            }
             $draftMessages = $this->messageService->getDraftMessagesCount();
             $scheduledMessages = $this->messageService->getScheduledMessagesCount();
             $sentMessages = $this->messageService->getSentMessagesCount();

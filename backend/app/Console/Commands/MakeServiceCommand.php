@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Str;
 
 class MakeServiceCommand extends Command
 {
@@ -45,8 +46,12 @@ class MakeServiceCommand extends Command
      */
     public function handle()
     {
+        // Get the raw name from the argument
         $name = $this->argument('name');
-        $path = $this->getPath($name);
+
+        // Normalize backslashes to forward slashes for path creation
+        $pathName = str_replace('\\', '/', $name);
+        $path = $this->getPath($pathName);
 
         if ($this->files->exists($path)) {
             $this->error('Service already exists!');
@@ -54,7 +59,10 @@ class MakeServiceCommand extends Command
         }
 
         $this->makeDirectory($path);
-        $this->files->put($path, $this->buildClass($name));
+
+        // For namespace generation, we need backslashes
+        $namespaceName = str_replace('/', '\\', $pathName);
+        $this->files->put($path, $this->buildClass($namespaceName));
 
         $this->info('Service created successfully.');
     }
@@ -67,6 +75,8 @@ class MakeServiceCommand extends Command
      */
     protected function getPath($name)
     {
+        // Replace forward slashes with the system's directory separator
+        $name = str_replace('\\', '/', $name);
         return app_path("Services/{$name}.php");
     }
 
@@ -79,8 +89,30 @@ class MakeServiceCommand extends Command
     protected function makeDirectory($path)
     {
         if (!$this->files->isDirectory(dirname($path))) {
-            $this->files->makeDirectory(dirname($path), 0755, true, true);
+            $this->files->makeDirectory(dirname($path), 0777, true, true);
         }
+    }
+
+    /**
+     * Get the namespace for the class.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    protected function getNamespace($name)
+    {
+        // Start with the base namespace
+        $namespace = 'App\\Services';
+
+        // Remove the class name part to get the sub-namespace
+        $subNamespace = trim(implode('\\', array_slice(explode('\\', $name), 0, -1)), '\\');
+
+        // Append the sub-namespace if it exists
+        if (!empty($subNamespace)) {
+            $namespace .= '\\' . $subNamespace;
+        }
+
+        return $namespace;
     }
 
     /**
@@ -91,14 +123,17 @@ class MakeServiceCommand extends Command
      */
     protected function buildClass($name)
     {
+        $stub = $this->files->get(__DIR__ . '/stubs/service.stub');
 
-        $modelName = str_replace('Service', '', $name);
+        $namespace = $this->getNamespace($name);
+        $className = class_basename($name);
+        $modelName = str_replace('Service', '', $className);
 
-        $stub = file_get_contents(__DIR__.'/stubs/service.stub');
+        // Replace placeholders in the stub
+        $stub = str_replace('{{namespace}}', $namespace, $stub);
+        $stub = str_replace('{{className}}', $className, $stub);
+        $stub = str_replace('{{modelName}}', $modelName, $stub);
 
-        return str_replace(['{{className}}', '{{modelName}}'], [$name, $modelName], $stub);
+        return $stub;
     }
 }
-
-// php artisan make:service CategoryService
-// This will create a service class for the Category model in the Services directory.

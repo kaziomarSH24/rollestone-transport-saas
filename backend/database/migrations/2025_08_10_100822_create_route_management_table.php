@@ -45,10 +45,13 @@ return new class extends Migration
             $table->id();
             $table->foreignId('company_id')->constrained('companies')->onDelete('cascade');
             $table->foreignId('route_id')->constrained('routes')->onDelete('cascade');
+             $table->string('trip_number')->nullable();
             $table->time('departure_time');
              $table->enum('direction', ['outbound', 'inbound']);
             $table->boolean('is_active')->default(true);
             $table->timestamps();
+
+             $table->unique(['company_id', 'trip_number']);
         });
     }
 

@@ -6,7 +6,7 @@ use App\Http\Controllers\Api\BaseController;
 use App\Http\Requests\Admin\DriverStoreRequest;
 use App\Http\Requests\Admin\DriverUpdateRequest;
 use App\Http\Resources\DriverResource;
-use App\Services\DriverService;
+use App\Services\Admin\DriverService;
 use Illuminate\Http\Request;
 use App\Traits\FileUploadTrait;
 
@@ -90,7 +90,7 @@ class DriverController extends BaseController
         try{
             $driver = $this->driverService->getById($id, ['user:id,avatar']);
             $user = $driver->user;
-            
+
           //remove avatar if exists
         if (!$driver) {
             return response_error('Driver not found.', [], 404);

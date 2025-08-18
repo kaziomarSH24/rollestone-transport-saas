@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Admin;
 
 use App\Models\Driver;
 use App\Models\User;
@@ -8,6 +8,8 @@ use App\Traits\FileUploadTrait;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use App\Services\AuthService;
+use App\Services\BaseService;
+use App\Services\UserService;
 
 class DriverService extends BaseService
 {

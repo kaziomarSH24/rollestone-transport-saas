@@ -60,24 +60,21 @@ abstract class BaseService
      */
     public function getAll(
         array $with = [],
-        int $perPage = 15,
+        ?int $perPage = null,
         ?Closure $queryCallback = null,
         ?string $orderBy = null,
         string $direction = 'desc'
     ) {
         $query = $this->model->with($with);
 
-        // Apply custom query constraints if provided
         if ($queryCallback) {
             $queryCallback($query);
         }
 
-        // Fallback to primary key if no orderBy specified
         $orderByColumn = $orderBy ?: $this->model->getKeyName();
+        $query->orderBy($orderByColumn, $direction);
 
-        return $query
-            ->orderBy($orderByColumn, $direction)
-            ->paginate($perPage);
+        return is_null($perPage) ? $query->get() : $query->paginate($perPage);
     }
 
     /**

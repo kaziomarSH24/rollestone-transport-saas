@@ -14,12 +14,14 @@ use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Auth\PasswordController;
 use App\Http\Controllers\Api\V1\Auth\ProfileController;
 use App\Http\Controllers\Api\V1\Auth\VerificationController;
+use App\Http\Controllers\Api\V1\Driver\JourneyController as DriverJourneyController;
+use App\Http\Controllers\Api\V1\Driver\TripController as DriverTripController;
 use App\Http\Controllers\Api\V1\Passenger\PaymentController;
 use App\Http\Controllers\Api\V1\Passenger\RoutesController;
 use App\Http\Controllers\Api\V1\WebhookController;
 use App\Models\Message;
 
-// --- Public Routes (Authentication) ---
+// **--- Public Routes (Authentication) ---
 Route::middleware('identify.company')->prefix('v1')->group(function () {
     Route::prefix('auth')->group(function () {
         Route::post('/register', [AuthController::class, 'register'])->name('api.v1.auth.register');
@@ -37,7 +39,7 @@ Route::middleware('identify.company')->prefix('v1')->group(function () {
     });
 });
 
-// --- Protected Routes (User must be logged in) ---
+// **--- Protected Routes (User must be logged in) ---
 Route::middleware('auth:sanctum', 'identify.company')->prefix('v1')->group(function () {
 
     // Auth related protected routes
@@ -52,7 +54,7 @@ Route::middleware('auth:sanctum', 'identify.company')->prefix('v1')->group(funct
         Route::post('/update', [ProfileController::class, 'updateProfile'])->name('update');
     });
 
-    // --- Admin Panel Routes ---
+    //** --- Admin Panel Routes ---
     Route::prefix('admin')->name('api.v1.admin.')->group(function () {
         //driver management routes
         Route::apiResource('drivers', DriverController::class)->except(['create', 'edit']);
@@ -85,7 +87,7 @@ Route::middleware('auth:sanctum', 'identify.company')->prefix('v1')->group(funct
     });
 
 
-    //--- Passenger Mobile App Routes ---
+    //**--- Passenger Mobile App Routes ---
     Route::prefix('passenger')->name('api.v1.passenger.')->group(function () {
         // Transaction history
         Route::get('/payment/transactions', [PaymentController::class, 'getTransactionHistory'])->name('transactions.history');
@@ -99,6 +101,23 @@ Route::middleware('auth:sanctum', 'identify.company')->prefix('v1')->group(funct
         Route::get('/routes', [RoutesController::class, 'index'])->name('routes.index');
         Route::get('/routes/{id}', [RoutesController::class, 'show'])->name('routes.show');
     });
+
+    // **--- Driver Routes ---
+    Route::prefix('driver')->name('api.v1.driver.')->group(function () {
+        // Block trip
+    Route::get('/routes/{route}/available-trips', [DriverTripController::class, 'getAvailableTrips']);
+    Route::post('/trips/block', [DriverJourneyController::class, 'block']);
+    Route::get('/trips/find', [DriverTripController::class, 'findByNumber']);
+    //driver schedule and journey management
+    Route::get('/journeys/driver-schedule', [DriverJourneyController::class, 'getDriverSchedule']);
+    Route::post('/journeys/{journey}/start', [DriverJourneyController::class, 'start']);
+    Route::post('/journeys/{journey}/end', [DriverJourneyController::class, 'end']);
+
+    // Route::post('/journeys/process-payment', [JourneyController::class, 'processPayment']);
+
+    });
+
+
 
     // --- Notification Routes ---
     Route::prefix('notifications')->as('notifications.')->group(function () {

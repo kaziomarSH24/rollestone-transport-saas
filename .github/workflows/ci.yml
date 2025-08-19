@@ -1,0 +1,43 @@
+
+name: Build and Push Custom Images to Docker Hub
+on:
+  push:
+    branches:
+      - main 
+
+
+jobs:
+  build-and-push:
+    name: Build and Push Images
+    runs-on: ubuntu-latest
+
+ 
+    steps:
+      
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }} 
+          password: ${{ secrets.DOCKERHUB_TOKEN }}  
+
+      # Backend push
+      - name: Build and push Backend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: true
+          tags: kaziomar/bus-ticket-app:latest 
+
+      # Nginx-Proxy push
+      - name: Build and push Nginx-Proxy image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./nginx
+          file: ./nginx/Dockerfile
+          push: true
+          tags: kaziomar/bus-ticket-nginx-proxy:latest 

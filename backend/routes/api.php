@@ -119,7 +119,7 @@ Route::middleware('auth:sanctum', 'identify.company')->prefix('v1')->group(funct
 
 
 
-    // --- Notification Routes ---
+    //** --- Notification Routes ---
     Route::prefix('notifications')->as('notifications.')->group(function () {
 
         Route::get('/', [NotificationController::class, 'index'])->name('index');
@@ -130,7 +130,7 @@ Route::middleware('auth:sanctum', 'identify.company')->prefix('v1')->group(funct
     });
 });
 
-// --- Webhook Routes ---
+//**--- Webhook Routes ---
 Route::post('/v1/stripe/webhook', [WebhookController::class, 'handleStripeWebhook'])->name('webhook.stripe');
 
 

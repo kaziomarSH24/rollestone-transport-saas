@@ -36,6 +36,7 @@ class SettingsController extends Controller
                 'stripe_secret_key' => 'nullable|string|starts_with:sk_test_,sk_live_',
                 'stripe_webhook_secret' => 'nullable|string',
                 'fare_rules' => 'nullable|string',
+                'zello_channel' => 'nullable|string|max:255',
             ]);
 
             if ($validator->fails()) {

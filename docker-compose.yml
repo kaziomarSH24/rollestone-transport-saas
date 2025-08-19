@@ -1,17 +1,15 @@
+# docker-compose.yml (Production Base File)
 # version: '3.8'
 
 services:
   # 1. Laravel PHP-FPM Service
   bus-ticket-app:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    image: my-bus-ticket-app
+    image: kaziomar/bus-ticket-app:latest # importing from Docker Hub
     container_name: bus-ticket-app
     restart: unless-stopped
     working_dir: /var/www
     volumes:
-      - ./backend:/var/www
+      - ./backend:/var/www 
       - /var/www/vendor
       - ./backend/php/custom.ini:/usr/local/etc/php/conf.d/custom.ini
     environment:
@@ -26,14 +24,13 @@ services:
     depends_on:
       - bus-ticket-db
 
-  # 2. NEW: Laravel Web Server (Nginx)
+  # 2. Laravel Web Server (Nginx)
   backend-webserver:
     image: nginx:stable-alpine
     container_name: bus-ticket-nginx-server
     restart: unless-stopped
     volumes:
       - ./backend:/var/www
-      # The line below is the crucial fix. We are mounting the whole folder.
       - ./backend/nginx_config/:/etc/nginx/conf.d
     networks:
       - bus-ticket-network
@@ -61,50 +58,30 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    
 
-      # 4. Landing Page Service (Nginx for React)
-      # frontend:
-      #   build:
-      #     context: ./frontend
-      #     dockerfile: Dockerfile
-      #   container_name: bus-ticket_frontend
-      #   restart: unless-stopped
-      #   ports:
-      #     - "3000:3000"
-      #   environment:
-      #     - PORT=3000
-      #   networks:
-      #     - bus-ticket-network
-
-      
   # 6. Main Nginx Reverse Proxy Service
   nginx-proxy:
-    build:
-      context: ./nginx
-      dockerfile: Dockerfile
-    image: bus-ticket-nginx-proxy
+    image: kaziomar/bus-ticket-nginx-proxy:latest # importing from Docker Hub
     container_name: bus-ticket-nginx
     restart: unless-stopped
     ports:
-      - "82:80" # for live server it will be 80:80
-      - "4444:443" # for live server it will be 443:443
+      - "82:80" # For server use "80:80"
+      - "4444:443" # For server use "443:443"
     networks:
       - bus-ticket-network
     depends_on:
-      - backend-webserver # Now depends on the Laravel Nginx server
-  # - frontend
+      - backend-webserver
 
-
+  # Queue Worker
   queue-worker:
-    image: my-bus-ticket-app
+    image: kaziomar/bus-ticket-app:latest # importing from Docker Hub
     container_name: bus-ticket-queue-worker
     command: php artisan queue:work --sleep=3 --tries=3
     restart: unless-stopped
     volumes:
       - ./backend:/var/www
       - /var/www/vendor
-    environment: # 
+    environment: 
       - DB_CONNECTION=mysql
       - DB_HOST=bus-ticket-db
       - DB_PORT=3306
@@ -119,15 +96,16 @@ services:
       bus-ticket-db:
         condition: service_healthy
 
+  # Scheduler
   scheduler:
-    image: my-bus-ticket-app
+    image: kaziomar/bus-ticket-app:latest # importing from Docker Hub
     container_name: bus-ticket-scheduler
     command: sh -c "while true; do php /var/www/artisan schedule:run; sleep 60; done"
     restart: unless-stopped
     volumes:
       - ./backend:/var/www
       - /var/www/vendor
-    environment: # 
+    environment: 
       - DB_CONNECTION=mysql
       - DB_HOST=bus-ticket-db
       - DB_PORT=3306
@@ -141,43 +119,26 @@ services:
         condition: service_started
       bus-ticket-db:
         condition: service_healthy
-      
 
+  # PHPMyAdmin
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
     container_name: bus-ticket-phpmyadmin
     restart: unless-stopped
     ports:
-      - "8082:80"  #for live server it will be 8080:80
+      - "8082:80" # For server use "8080:80"
     environment:
       PMA_HOST: bus-ticket-db
-      PMA_PORT: 3306 
-      #   PMA_USER: mytsv_root
-      #   PMA_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      PMA_PORT: 3306
       PMA_ARBITRARY: 0
     networks:
       - bus-ticket-network
 
-# 5. NEW: Socket Server Service
-# socket-server:
-#   build:
-#     context: ./socket-server
-#     dockerfile: Dockerfile
-#   container_name: bus-ticket-socket-server
-#   restart: unless-stopped
-#   environment:
-#     - PORT=3001
-#   networks:
-#     - bus-ticket-network
-#   depends_on:
-#     - bus-ticket-app
-
-# Define the custom network
+# Networks and Volumes
 networks:
   bus-ticket-network:
     driver: bridge
 
-# Define the persistent volume for the database
 volumes:
   db_data:
     driver: local

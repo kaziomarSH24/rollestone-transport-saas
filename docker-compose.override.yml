@@ -1,0 +1,26 @@
+# version: '3.8'
+
+services:
+  bus-ticket-app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: my-bus-ticket-app #local image name
+
+  nginx-proxy:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    image: bus-ticket-nginx-proxy #local image name
+
+  queue-worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: my-bus-ticket-app # Use the same local image name
+
+  scheduler:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: my-bus-ticket-app # Use the same local image name 

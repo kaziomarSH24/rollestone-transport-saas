@@ -31,11 +31,14 @@ class AuthController extends Controller
         // If the driver exists and the pin code matches, generate a token
         $user = $driver->user;
         $token = $user->createToken('driver-auth-token')->plainTextToken;
+        $company = $user->load('company:id,zello_channel')->company; // Load the company with Zello
+        $user->makeHidden(['company']);
 
         return response_success('Driver login successful.', [
             'access_token' => $token,
             'token_type' => 'Bearer',
             'driver_details' => $driver,
+            'zello_channel' => $user->company->zello_channel ?? null,
         ]);
     }
 }

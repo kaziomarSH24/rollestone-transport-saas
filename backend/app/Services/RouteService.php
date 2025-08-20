@@ -18,7 +18,6 @@ class RouteService extends BaseService
     {
         // Ensure BaseService initializes the model instance
         parent::__construct();
-
     }
 
 
@@ -78,10 +77,10 @@ class RouteService extends BaseService
                 'payment_method' => 'Cash',
                 'amount' => $fare['cash_amount'],
             ];
-            // Create another record for User App payment
+            // Create another record for User App (Wallet) payment
             $fareDataToInsert[] = [
                 'passenger_type' => $fare['passenger_type'],
-                'payment_method' => 'User App',
+                'payment_method' => 'Wallet',
                 'amount' => $fare['app_amount'],
             ];
         }

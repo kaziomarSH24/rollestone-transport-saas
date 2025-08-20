@@ -24,7 +24,7 @@ class RouteDetailResource extends JsonResource
             'google_map_link' => $this->google_map_link,
             'route_prefix' => $this->route_prefix,
             'status' => $this->status,
-            'fares' => $this->fares->where('payment_method', 'User App')->map(function ($fare) {
+            'fares' => $this->fares->where('payment_method', 'Wallet')->map(function ($fare) {
                 return [
                     'type' => $fare->passenger_type,
                     'price' => (float) $fare->amount,

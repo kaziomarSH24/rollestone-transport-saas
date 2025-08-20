@@ -64,6 +64,7 @@ Route::middleware('auth:sanctum', 'identify.company')->prefix('v1')->group(funct
         Route::apiResource('passengers', PassengerController::class)->except(['create', 'edit']);
         //passenger wallet top-up
         Route::post('passengers/{passenger}/top-up', [PassengerController::class, 'topUpWallet'])->name('passengers.topUp');
+        Route::post('/passengers/{passenger}/refund', [PassengerController::class, 'refund'])->name('passengers.refund');
 
 
         //company management routes
@@ -113,8 +114,8 @@ Route::middleware('auth:sanctum', 'identify.company')->prefix('v1')->group(funct
     Route::post('/journeys/{journey}/start', [DriverJourneyController::class, 'start']);
     Route::post('/journeys/{journey}/end', [DriverJourneyController::class, 'end']);
 
-    // Route::post('/journeys/process-payment', [JourneyController::class, 'processPayment']);
-
+    Route::post('/journeys/process-payment', [DriverJourneyController::class, 'processPayment']);
+    Route::post('/journeys/process-single-payment', [DriverJourneyController::class, 'processSingleUserPayment']);
     });
 
 

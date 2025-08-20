@@ -61,6 +61,7 @@ class ProcessAutoTopUps extends Command
                         'type' => 'AutoTopUp',
                         'amount' => $topUpAmount,
                         'status' => 'pending',
+                        'payment_method' => 'Stripe', // Specify payment method
                     ]);
 
                     // Create the PaymentIntent. The database will be updated by the webhook.

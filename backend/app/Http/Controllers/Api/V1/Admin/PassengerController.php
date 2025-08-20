@@ -31,7 +31,7 @@ class PassengerController extends Controller
         $this->middleware('can:create passengers')->only(['store']);
         $this->middleware('can:edit passengers')->only(['update']);
         $this->middleware('can:delete passengers')->only(['destroy']);
-        $this->middleware('can:manage passenger wallet')->only(['topUpWallet']);
+        $this->middleware('can:manage passenger wallet')->only(['topUpWallet', 'refund']);
     }
 
     /**
@@ -68,8 +68,7 @@ class PassengerController extends Controller
 
             $validatedData = $request->validated();
             $validatedData['username'] = $this->authService->generateUniqueUsername($validatedData['name']);
-            $validatedData['email_verified_at'] = now();
-            // Automatically verify email for admin-created passengers
+            $validatedData['email_verified_at'] = now(); // Automatically verify email for admin-created passengers
             $passenger = $this->passengerService->create($validatedData);
 
             $passenger->assignRole('Passenger');
@@ -164,11 +163,29 @@ class PassengerController extends Controller
                 $request->user()
             );
 
-            return response_success('Top-up successful.', ['new_balance' => $passenger->wallet->balance]);
+            return response_success('Top-up successful.', ['new_balance' => $passenger->wallet->balance + $validated['amount']]);
 
-            return response_success('Wallet topped up successfully.', ['balance' => $passenger->wallet->balance]);
+            // return response_success('Wallet topped up successfully.', ['balance' => $passenger->wallet->balance]);
         } catch (\Exception $e) {
             return response_error('Failed to top up wallet: ' . $e->getMessage(), [], 500);
+        }
+    }
+     /**
+     * Refund funds from a passenger's wallet.
+     */
+    public function refund(Request $request, User $passenger)
+    {
+        $validated = $request->validate(['amount' => 'required|numeric|min:1']);
+
+        try {
+            $this->walletService->manualRefund(
+                $passenger,
+                $validated['amount'],
+                $request->user()
+            );
+            return response_success('Refund successful.', ['new_balance' => $passenger->wallet->balance]);
+        } catch (\Exception $e) {
+            return response_error($e->getMessage());
         }
     }
 }

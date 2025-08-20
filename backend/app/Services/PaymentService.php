@@ -74,6 +74,7 @@ class PaymentService
             'type' => 'TopUp',
             'amount' => $amount,
             'status' => 'pending',
+            'payment_method' => 'Stripe',
         ]);
 
         $paymentIntent = PaymentIntent::create([
@@ -140,6 +141,7 @@ class PaymentService
         $transaction = $user->transactions()->create([
             'company_id' => $user->company_id,
             'type' => 'TopUp',
+            'payment_method' => 'Stripe',
             'amount' => $amount,
             'status' => 'pending',
         ]);
@@ -195,6 +197,7 @@ class PaymentService
                 'amount' => -$originalTransaction->amount, // Store refunds as negative
                 'status' => 'pending',
                 'stripe_charge_id' => $stripeChargeId,
+                'payment_method' => 'Stripe',
             ]);
 
             // Initiate the refund with Stripe

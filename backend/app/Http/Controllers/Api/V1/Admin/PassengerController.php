@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UpdatePassengerProfile;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Resources\UserResource;
+use App\Models\User;
 use App\Services\Admin\PassengerService;
 use App\Services\AuthService;
+use App\Services\WalletService;
 use Illuminate\Http\Request;
 use App\Traits\FileUploadTrait;
 
@@ -17,10 +19,12 @@ class PassengerController extends Controller
 
     protected PassengerService $passengerService;
     protected AuthService $authService;
-    public function __construct(PassengerService $passengerService, AuthService $authService)
+    protected WalletService $walletService;
+    public function __construct(PassengerService $passengerService, AuthService $authService, WalletService $walletService)
     {
         $this->passengerService = $passengerService;
         $this->authService = $authService;
+        $this->walletService = $walletService;
         // Middleware for authorization
 
         $this->middleware('can:view passengers')->only(['index', 'show']);
@@ -139,14 +143,14 @@ class PassengerController extends Controller
     }
 
     //top up passenger wallet
-    public function topUpWallet(Request $request, string $id)
+    public function topUpWallet(Request $request, User $passenger)
     {
-        $request->validate([
+       $validated = $request->validate([
             'amount' => 'required|numeric|min:1',
         ]);
         try {
-            $passenger = $this->passengerService->getById($id, ['wallet']);
-            if (!$passenger || !$passenger->hasRole('Passenger')) {
+            // Check if the passenger exists and has the 'Passenger' role
+            if (!$passenger->hasRole('Passenger')) {
                 return response_error('Passenger not found.', [], 404);
             }
 
@@ -154,10 +158,13 @@ class PassengerController extends Controller
             if (!$passenger->wallet) {
                 return response_error('Passenger does not have a wallet.', [], 400);
             }
+            $this->walletService->manualTopUp(
+                $passenger,
+                $validated['amount'],
+                $request->user()
+            );
 
-            // Top up the wallet
-            $amount = $request->input('amount');
-            $passenger->wallet->increment('balance', $amount);
+            return response_success('Top-up successful.', ['new_balance' => $passenger->wallet->balance]);
 
             return response_success('Wallet topped up successfully.', ['balance' => $passenger->wallet->balance]);
         } catch (\Exception $e) {

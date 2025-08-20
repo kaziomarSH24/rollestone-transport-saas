@@ -63,7 +63,7 @@ Route::middleware('auth:sanctum', 'identify.company')->prefix('v1')->group(funct
         //->passenger management routes
         Route::apiResource('passengers', PassengerController::class)->except(['create', 'edit']);
         //passenger wallet top-up
-        Route::post('passengers/{id}/top-up', [PassengerController::class, 'topUpWallet'])->name('passengers.topUp');
+        Route::post('passengers/{passenger}/top-up', [PassengerController::class, 'topUpWallet'])->name('passengers.topUp');
 
 
         //company management routes

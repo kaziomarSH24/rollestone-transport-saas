@@ -39,4 +39,10 @@ class Transaction extends Model
     {
         return $this->belongsTo(Company::class);
     }
+
+    //relattionships with journey and payment method
+    public function journey()
+    {
+        return $this->belongsTo(Journey::class);
+    }
 }

@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\V1\Driver\JourneyController as DriverJourneyControl
 use App\Http\Controllers\Api\V1\Driver\TripController as DriverTripController;
 use App\Http\Controllers\Api\V1\Passenger\PaymentController;
 use App\Http\Controllers\Api\V1\Passenger\RoutesController;
+use App\Http\Controllers\Api\V1\TransactionController;
 use App\Http\Controllers\Api\V1\WebhookController;
 use App\Models\Message;
 
@@ -41,6 +42,9 @@ Route::middleware('identify.company')->prefix('v1')->group(function () {
 
 // **--- Protected Routes (User must be logged in) ---
 Route::middleware('auth:sanctum', 'identify.company')->prefix('v1')->group(function () {
+
+    //Transaction related routes
+     Route::get('/transactions/history', [TransactionController::class, 'index']);
 
     // Auth related protected routes
     Route::prefix('auth')->name('api.v1.auth.')->group(function () {

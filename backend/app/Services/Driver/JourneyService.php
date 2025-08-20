@@ -131,7 +131,6 @@ class JourneyService extends BaseService
                 'unit_price' => $fare->amount,
             ];
         }
-        dd($totalAmount, $fareDetailsForJson);
         $passenger = null;
         if ($paymentMethod === 'Wallet') {
             $passenger = User::where('qr_code_number', $qrNumber)->firstOrFail();

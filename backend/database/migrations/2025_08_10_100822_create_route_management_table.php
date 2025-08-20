@@ -36,7 +36,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('route_id')->constrained('routes')->onDelete('cascade');
             $table->string('passenger_type'); // e.g., 'Child', 'Adult'
-            $table->string('payment_method'); // e.g., 'Cash', 'User App'
+            $table->string('payment_method'); // e.g., 'Cash', 'Wallet'
             $table->decimal('amount', 8, 2);
             $table->timestamps();
         });

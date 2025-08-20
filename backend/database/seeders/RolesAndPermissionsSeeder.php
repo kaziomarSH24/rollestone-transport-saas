@@ -136,6 +136,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'end own trip',
             'validate tickets',
             'view notifications', // Drivers can view notifications.
+            'manage passenger wallet'
         ]);
 
         // Passenger Role -> No special backend permissions.
@@ -178,4 +179,6 @@ class RolesAndPermissionsSeeder extends Seeder
 
         $superAdminUser->assignRole($superAdminRole);
     }
+
+    // php artisan db:seed --class=RolesAndPermissionsSeeder
 }

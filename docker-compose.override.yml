@@ -24,3 +24,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     image: my-bus-ticket-app # Use the same local image name 
+
+  bus-ticket-redis:
+    ports:
+      - "6379:6379"

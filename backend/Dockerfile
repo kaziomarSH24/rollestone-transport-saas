@@ -28,6 +28,10 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
 # Install other required PHP extensions
 RUN docker-php-ext-install -j$(nproc) pdo pdo_mysql mbstring exif pcntl bcmath zip
 
+# Install redis extension via PECL
+RUN pecl install redis \
+    && docker-php-ext-enable redis
+
 # Get the latest Composer binary
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 

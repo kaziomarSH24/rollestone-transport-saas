@@ -11,7 +11,7 @@ class TransactionService
     /**
      * Get the transaction history for a specific user based on their role.
      */
-    public function getHistoryForUser(User $user, int $perPage = 15, ?string $filterType = null): LengthAwarePaginator
+    public function getHistoryForUser(User $user, int $perPage = 15, ?string $filter = null): LengthAwarePaginator
     {
        $query = null;
 
@@ -25,8 +25,15 @@ class TransactionService
         }
 
         //Apply the type filter if it's provided.
-        if ($filterType) {
-            $query->where('type', $filterType);
+        if ($filter) {
+            match ($filter) {
+                'this_week' => $query->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]),
+                'this_month' => $query->whereMonth('created_at', now()->month),
+                'refund' => $query->whereIn('type', ['Refund', 'CashRefund']),
+                'topups' => $query->whereIn('type', ['TopUp', 'CashTopUp', 'StripeTopUp', 'AutoTopUp']),
+                'trips' => $query->where('type', 'TripFare'),
+                default => null, // 'All' filter does nothing.
+            };
         }
 
         return $query->latest()->paginate($perPage);

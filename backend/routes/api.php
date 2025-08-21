@@ -132,6 +132,9 @@ Route::middleware('auth:sanctum', 'identify.company')->prefix('v1')->group(funct
         Route::post('/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->name('markAllAsRead');
         Route::patch('/{notification}/read', [NotificationController::class, 'markAsRead'])->name('markAsRead');
         Route::delete('/{notification}', [NotificationController::class, 'destroy'])->name('destroy');
+
+        //custom admin alerts notification
+        Route::get('/alerts', [NotificationController::class, 'alerts']);
     });
 });
 

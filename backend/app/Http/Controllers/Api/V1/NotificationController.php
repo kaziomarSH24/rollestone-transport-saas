@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\NotificationResource;
+use App\Notifications\Admin\CustomAlert;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,7 +19,7 @@ class NotificationController extends Controller
        try{
          $perPage = request()->get('per_page', 15); // Default to 15 if not specified
         $notifications = Auth::user()->notifications()->paginate($perPage);
-        return $notifications;
+        return NotificationResource::collection($notifications);
        }catch (\Exception $e) {
             return response()->json(['ok' => false, 'message' => 'Failed to fetch notifications: ' . $e->getMessage()], 500);
         }
@@ -99,5 +101,16 @@ class NotificationController extends Controller
         } catch (\Exception $e) {
             return response()->json(['ok' => false, 'message' => 'Failed to delete notification: ' . $e->getMessage()], 500);
         }
+    }
+
+     public function alerts(Request $request)
+    {
+
+        $alerts = $request->user()
+                          ->notifications()
+                          ->where('type', CustomAlert::class)
+                          ->paginate(15);
+
+        return NotificationResource::collection($alerts);
     }
 }

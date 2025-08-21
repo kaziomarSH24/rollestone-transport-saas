@@ -133,6 +133,20 @@ services:
       PMA_ARBITRARY: 0
     networks:
       - bus-ticket-network
+  
+  # Redis Service
+  bus-ticket-redis:
+    image: redis:7-alpine 
+    container_name: bus-ticket-redis
+    volumes:
+      - bus-ticket-redis-data:/data
+    networks:
+      - bus-ticket-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 # Networks and Volumes
 networks:
@@ -141,4 +155,5 @@ networks:
 
 volumes:
   db_data:
+  bus-ticket-redis-data:
     driver: local

@@ -24,6 +24,7 @@ class WalletService
                 'amount' => $amount,
                 'status' => 'succeeded',
                 'processed_by_user_id' => $staff->id,
+                'payment_method' => $paymentMethod,
             ]);
             // Notify the passenger about the top-up
             $passenger->notify(new ManualTopUpNotification($amount, $staff));
@@ -47,6 +48,7 @@ class WalletService
                 'amount' => -$amount, // Refunds are stored as negative
                 'status' => 'succeeded',
                 'processed_by_user_id' => $staff->id,
+                'payment_method' => 'Cash',
             ]);
 
             // Notify the passenger about the refund

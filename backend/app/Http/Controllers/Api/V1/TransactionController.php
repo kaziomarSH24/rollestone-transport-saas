@@ -22,7 +22,7 @@ class TransactionController extends Controller
     public function index(Request $request)
     {
         $perPage = $request->query('per_page', 15);
-        $filterType = $request->query('type');
+        $filterType = $request->query('filter'); // 
 
         $transactions = $this->transactionService->getHistoryForUser($request->user(), $perPage, $filterType);
         if ($transactions->isEmpty()) {

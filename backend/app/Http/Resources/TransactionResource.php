@@ -17,12 +17,11 @@ class TransactionResource extends JsonResource
     {
 
         $routeName = $this->journey?->trip?->route?->name ?? 'Wallet Transaction';
-        $departureTime = $this->journey?->trip?->departure_time ? Carbon::parse($this->journey->trip->departure_time)->format('h:i A') : '';
-        $journeyDate = $this->journey?->journey_date ? Carbon::parse($this->journey->journey_date)->format('F j, Y') : Carbon::parse($this->created_at)->format('F j, Y');
+
 
         return [
             'id' => $this->id,
-            'date_time' => "{$journeyDate} - {$departureTime}",
+            'date_time' => Carbon::parse($this->created_at)->format('F j, Y - h:i A'),
             'description' => $routeName,
             'type' => $this->type, // 'TopUp', 'TripFare', 'Refund'
             'payment_method' => $this->payment_method, // 'Wallet', 'Cash', 'Stripe'

@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\Admin\CompanyController;
 use App\Http\Controllers\Api\V1\Admin\DriverController;
 use App\Http\Controllers\Api\V1\Admin\MessageController;
 use App\Http\Controllers\Api\V1\Admin\PassengerController;
+use App\Http\Controllers\Api\V1\Admin\ReportingController;
 use App\Http\Controllers\Api\V1\Admin\RouteController;
 use App\Http\Controllers\Api\V1\Admin\SettingsController;
 use App\Http\Controllers\Api\V1\Admin\TripController;
@@ -44,7 +45,7 @@ Route::middleware('identify.company')->prefix('v1')->group(function () {
 Route::middleware('auth:sanctum', 'identify.company')->prefix('v1')->group(function () {
 
     //Transaction related routes
-     Route::get('/transactions/history', [TransactionController::class, 'index']);
+    Route::get('/transactions/history', [TransactionController::class, 'index']);
 
     // Auth related protected routes
     Route::prefix('auth')->name('api.v1.auth.')->group(function () {
@@ -89,6 +90,14 @@ Route::middleware('auth:sanctum', 'identify.company')->prefix('v1')->group(funct
         Route::apiResource('messages', MessageController::class)->except(['create', 'edit']);
         Route::get('messages/dashboard/stats', [MessageController::class, 'dashboardStats']);
         // You can add more message-related routes
+
+        // Reporting Routes
+        Route::get('/reports/revenue-by-route', [ReportingController::class, 'revenueByRoute']);
+        Route::get('/reports/monthly-trends', [ReportingController::class, 'monthlyTrends']);
+        Route::get('/reports/cash-reconciliation', [ReportingController::class, 'getCashReconciliation']);
+        Route::post('/reports/cash-reconciliation/check', [ReportingController::class, 'checkCashReconciliation']);
+        Route::get('/reports/passenger-analytics', [ReportingController::class, 'passengerAnalytics']);
+        Route::get('/reports/route-statistics', [ReportingController::class, 'routeStatistics']);
     });
 
 
@@ -110,16 +119,16 @@ Route::middleware('auth:sanctum', 'identify.company')->prefix('v1')->group(funct
     // **--- Driver Routes ---
     Route::prefix('driver')->name('api.v1.driver.')->group(function () {
         // Block trip
-    Route::get('/routes/{route}/available-trips', [DriverTripController::class, 'getAvailableTrips']);
-    Route::post('/trips/block', [DriverJourneyController::class, 'block']);
-    Route::get('/trips/find', [DriverTripController::class, 'findByNumber']);
-    //driver schedule and journey management
-    Route::get('/journeys/driver-schedule', [DriverJourneyController::class, 'getDriverSchedule']);
-    Route::post('/journeys/{journey}/start', [DriverJourneyController::class, 'start']);
-    Route::post('/journeys/{journey}/end', [DriverJourneyController::class, 'end']);
+        Route::get('/routes/{route}/available-trips', [DriverTripController::class, 'getAvailableTrips']);
+        Route::post('/trips/block', [DriverJourneyController::class, 'block']);
+        Route::get('/trips/find', [DriverTripController::class, 'findByNumber']);
+        //driver schedule and journey management
+        Route::get('/journeys/driver-schedule', [DriverJourneyController::class, 'getDriverSchedule']);
+        Route::post('/journeys/{journey}/start', [DriverJourneyController::class, 'start']);
+        Route::post('/journeys/{journey}/end', [DriverJourneyController::class, 'end']);
 
-    Route::post('/journeys/process-payment', [DriverJourneyController::class, 'processPayment']);
-    Route::post('/journeys/process-single-payment', [DriverJourneyController::class, 'processSingleUserPayment']);
+        Route::post('/journeys/process-payment', [DriverJourneyController::class, 'processPayment']);
+        Route::post('/journeys/process-single-payment', [DriverJourneyController::class, 'processSingleUserPayment']);
     });
 
 
@@ -145,9 +154,7 @@ Route::post('/v1/stripe/webhook', [WebhookController::class, 'handleStripeWebhoo
 // test api route
 Route::get('/v1/test', function (Request $request) {
     dd(now()->toDateTimeString());
-   return $messagesToSend = Message::where('status', 'scheduled')
-            ->where('scheduled_at', '<=', now())
-            ->get();
-
-
+    return $messagesToSend = Message::where('status', 'scheduled')
+        ->where('scheduled_at', '<=', now())
+        ->get();
 })->name('api.v1.test');

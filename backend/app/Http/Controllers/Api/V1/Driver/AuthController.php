@@ -18,6 +18,7 @@ class AuthController extends Controller
         $request->validate([
             'staff_number' => 'required|string',
             'pin_code' => 'required|string',
+            // 'fcm_token' => 'nullable|string|max:500'
         ]);
 
         $driver = Driver::where('staff_number', $request->staff_number)->first();
@@ -30,6 +31,12 @@ class AuthController extends Controller
 
         // If the driver exists and the pin code matches, generate a token
         $user = $driver->user;
+
+        // // Update FCM token if provided
+        // if ($request->fcm_token) {
+        //     $user->update(['fcm_token' => $request->fcm_token]);
+        // }
+
         $token = $user->createToken('driver-auth-token')->plainTextToken;
         $company = $user->load('company:id,zello_channel')->company; // Load the company with Zello
         $user->makeHidden(['company']);

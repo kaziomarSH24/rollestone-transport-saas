@@ -22,3 +22,7 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+firebase-credentials.json
+/public/fcmTest.html
+/public/firebase-messaging-sw.js
+/app/Http/Controllers/TestController.php

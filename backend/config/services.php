@@ -42,4 +42,9 @@ return [
         'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
     ],
 
+    'fcm' => [
+        'driver' => 'fcm',
+        'credentials' => base_path(env('FIREBASE_CREDENTIALS')),
+    ],
+
 ];

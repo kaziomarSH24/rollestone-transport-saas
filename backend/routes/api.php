@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\V1\Auth\ProfileController;
 use App\Http\Controllers\Api\V1\Auth\VerificationController;
 use App\Http\Controllers\Api\V1\Driver\JourneyController as DriverJourneyController;
 use App\Http\Controllers\Api\V1\Driver\TripController as DriverTripController;
+use App\Http\Controllers\api\V1\Passenger\AlertController;
 use App\Http\Controllers\Api\V1\Passenger\PaymentController;
 use App\Http\Controllers\Api\V1\Passenger\RoutesController;
 use App\Http\Controllers\Api\V1\TransactionController;
@@ -114,6 +115,12 @@ Route::middleware('auth:sanctum', 'identify.company')->prefix('v1')->group(funct
         // Routes for passengers
         Route::get('/routes', [RoutesController::class, 'index'])->name('routes.index');
         Route::get('/routes/{id}', [RoutesController::class, 'show'])->name('routes.show');
+
+        //trip alert routes
+        Route::get('/alerts', [AlertController::class, 'index']);
+        Route::post('/alerts/toggle', [AlertController::class, 'toggleAlert']);
+        Route::post('/alerts/fcm-token', [AlertController::class, 'updateFcmToken']);
+        Route::get('/alerts/my-alerts', [AlertController::class, 'myAlerts']);
     });
 
     // **--- Driver Routes ---
@@ -153,8 +160,5 @@ Route::post('/v1/stripe/webhook', [WebhookController::class, 'handleStripeWebhoo
 
 // test api route
 Route::get('/v1/test', function (Request $request) {
-    dd(now()->toDateTimeString());
-    return $messagesToSend = Message::where('status', 'scheduled')
-        ->where('scheduled_at', '<=', now())
-        ->get();
+    return (new \App\Http\Controllers\TestController)->index();
 })->name('api.v1.test');

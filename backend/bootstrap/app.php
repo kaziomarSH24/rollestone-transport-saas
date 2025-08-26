@@ -22,6 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withSchedule(function (Schedule $schedule) {
         $schedule->command('autotopup:process')->everyTenMinutes();
         $schedule->command('messages:send-scheduled')->everyMinute();
+        $schedule->command('alerts:schedule-trip-alerts')->dailyAt('03:00');
     })
     ->withExceptions(function (Exceptions $exceptions) {
        //

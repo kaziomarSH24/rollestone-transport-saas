@@ -32,8 +32,14 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+            'fcm_token' => 'nullable|string|max:500'
+        ]);
+
         try {
-            $data = $this->authService->login($request->only('email', 'password'));
+            $data = $this->authService->login($request->only('email', 'password', 'fcm_token'));
             return response_success('Login successful', $data);
         } catch (ValidationException $e) {
             return response_error($e->getMessage(), $e->errors(), 401);

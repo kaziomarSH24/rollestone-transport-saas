@@ -25,6 +25,7 @@ class RegisterRequest extends BaseRequest
             'phone_number' => 'nullable|string|max:15',
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Max 2MB
             'address' => 'nullable|string',
+            'fcm_token' => 'nullable|string|max:500', // FCM token for push notifications
         ];
     }
 

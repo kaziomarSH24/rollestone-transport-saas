@@ -48,6 +48,7 @@ class AuthService
             'avatar' => $data['avatar'] ?? null,
             'address' => $data['address'] ?? null,
             'qr_code_number' => $data['qr_code_number'],
+            'fcm_token' => $data['fcm_token'] ?? null, // Save FCM token during registration
             'status' => 'active',
             'otp' => $otp,
             'verification_token' => $token,
@@ -115,6 +116,11 @@ class AuthService
 
         if (!$user->hasVerifiedEmail()) {
             throw ValidationException::withMessages(['email' => 'Please verify your email first.']);
+        }
+
+        // Update FCM token if provided
+        if (isset($credentials['fcm_token']) && $credentials['fcm_token']) {
+            $user->update(['fcm_token' => $credentials['fcm_token']]);
         }
 
         $token = $user->createToken('auth_token')->plainTextToken;

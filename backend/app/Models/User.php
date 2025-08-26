@@ -110,4 +110,17 @@ class User extends Authenticatable
         return $this->hasMany(Transaction::class);
     }
 
+    // Trip alerts relationship
+    public function tripAlerts(): HasMany
+    {
+        return $this->hasMany(TripAlert::class);
+    }
+
+
+    //relationship with device tokens
+    public function deviceTokens(): HasMany
+    {
+        return $this->hasMany(DeviceToken::class);
+    }
+
 }

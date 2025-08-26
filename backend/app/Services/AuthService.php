@@ -48,12 +48,15 @@ class AuthService
             'avatar' => $data['avatar'] ?? null,
             'address' => $data['address'] ?? null,
             'qr_code_number' => $data['qr_code_number'],
-            'fcm_token' => $data['fcm_token'] ?? null, // Save FCM token during registration
             'status' => 'active',
             'otp' => $otp,
             'verification_token' => $token,
             'otp_expires_at' => Carbon::now()->addMinutes(10),
         ]);
+
+        if (!empty($data['fcm_token'])) {
+            $this->registerFcmToken($user, $data['fcm_token']);
+        }
 
         $user->assignRole('Passenger');
         $user->notify((new SendOtpNotification($otp, $token, 'verify your account', '/verify-email'))->onTenant());
@@ -119,8 +122,8 @@ class AuthService
         }
 
         // Update FCM token if provided
-        if (isset($credentials['fcm_token']) && $credentials['fcm_token']) {
-            $user->update(['fcm_token' => $credentials['fcm_token']]);
+        if (!empty($credentials['fcm_token'])) {
+            $this->registerFcmToken($user, $credentials['fcm_token']);
         }
 
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -130,6 +133,14 @@ class AuthService
             'token_type' => 'Bearer',
             'user' => $user->load('roles', 'permissions'),
         ];
+    }
+
+     public function registerFcmToken(User $user, string $token): void
+    {
+        $user->deviceTokens()->updateOrCreate(
+            ['token' => $token],
+            ['user_id' => $user->id]
+        );
     }
 
     /**

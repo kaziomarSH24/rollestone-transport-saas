@@ -83,12 +83,11 @@ class DriverService extends BaseService
     }
 
     /**
-     * Updates an existing Driver and their associated User record.
-     * This method perfectly utilizes the transactionalCallback from your ManagesData trait.
+     * Update an existing driver and their associated user record.
      */
     public function updateDriver(int $driverId, array $validatedData): Driver
     {
-          // Prepare data for the main model (Driver)
+
         $driverFields = ['staff_number', 'license_number', 'license_expiry_date','experience_years'];
         $driverUpdates = array_intersect_key($validatedData, array_flip($driverFields));
 

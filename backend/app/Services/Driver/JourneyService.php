@@ -2,6 +2,7 @@
 
 namespace App\Services\Driver;
 
+use App\Events\BusLocationUpdated;
 use App\Models\Fare;
 use App\Services\BaseService;
 use App\Models\Journey;
@@ -218,6 +219,23 @@ class JourneyService extends BaseService
             'new_balance' => $passenger->wallet->balance,
             'transaction_id' => $transaction->id,
         ];
+    }
+
+    /**
+     * Updates the current GPS location and broadcasts the event.
+     */
+    public function updateJourneyLocation(Journey $journey, User $driverUser, float $latitude, float $longitude): void
+    {
+        // dd($journey);
+        if ($journey->driver_id !== $driverUser->driver->id || $journey->status !== 'ongoing') {
+            throw new \Exception('This journey is not active or does not belong to you.');
+        }
+
+        $journey->update([
+            'current_lat' => $latitude,
+            'current_lng' => $longitude,
+        ]);
+        broadcast(new BusLocationUpdated($journey->id, $latitude, $longitude));
     }
 
 }

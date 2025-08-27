@@ -28,3 +28,11 @@ services:
   bus-ticket-redis:
     ports:
       - "6379:6379"
+
+  reverb:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: my-bus-ticket-app # Use the same local image name
+    ports:
+      - "8888:8080"

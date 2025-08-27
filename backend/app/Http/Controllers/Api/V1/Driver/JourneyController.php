@@ -119,4 +119,30 @@ class JourneyController extends Controller
             return response_error($e->getMessage());
         }
     }
+
+
+    public function updateLocation(Request $request, Journey $journey)
+    {
+        $validator = Validator::make($request->all(), [
+            'latitude' => 'required|numeric|between:-90,90',
+            'longitude' => 'required|numeric|between:-180,180',
+        ]);
+
+        if ($validator->fails()) {
+            return response_error($validator->errors()->first(), $validator->errors()->toArray(), 422);
+        }
+        $validated = $validator->validated();
+
+        try {
+            $this->journeyService->updateJourneyLocation(
+                $journey,
+                $request->user(),
+                $validated['latitude'],
+                $validated['longitude']
+            );
+            return response_success('Location updated successfully.');
+        } catch (\Exception $e) {
+            return response_error($e->getMessage());
+        }
+    }
 }

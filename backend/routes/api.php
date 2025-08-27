@@ -136,6 +136,7 @@ Route::middleware('auth:sanctum', 'identify.company')->prefix('v1')->group(funct
 
         Route::post('/journeys/process-payment', [DriverJourneyController::class, 'processPayment']);
         Route::post('/journeys/process-single-payment', [DriverJourneyController::class, 'processSingleUserPayment']);
+        Route::post('/journeys/{journey}/update-location', [DriverJourneyController::class, 'updateLocation']);
     });
 
 

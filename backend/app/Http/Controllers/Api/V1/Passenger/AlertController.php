@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\api\V1\Passenger;
+namespace App\Http\Controllers\Api\V1\Passenger;
 
 use App\Http\Controllers\Controller;
 use App\Services\Passenger\AlertService;

@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\Admin\CompanyController;
 use App\Http\Controllers\Api\V1\Admin\DashboardController;
 use App\Http\Controllers\Api\V1\Admin\DriverController;
+use App\Http\Controllers\Api\V1\Admin\FaqController;
 use App\Http\Controllers\Api\V1\Admin\MessageController;
 use App\Http\Controllers\Api\V1\Admin\PassengerController;
 use App\Http\Controllers\Api\V1\Admin\ReportingController;
@@ -20,6 +21,7 @@ use App\Http\Controllers\Api\V1\Driver\JourneyController as DriverJourneyControl
 use App\Http\Controllers\Api\V1\Driver\TripController as DriverTripController;
 use App\Http\Controllers\api\V1\Passenger\AlertController;
 use App\Http\Controllers\Api\V1\Passenger\ContactFormController;
+use App\Http\Controllers\Api\V1\Passenger\PassengerFaqController;
 use App\Http\Controllers\Api\V1\Passenger\PaymentController;
 use App\Http\Controllers\Api\V1\Passenger\RoutesController;
 use App\Http\Controllers\Api\V1\TransactionController;
@@ -105,6 +107,9 @@ Route::middleware('auth:sanctum', 'identify.company')->prefix('v1')->group(funct
         Route::post('/reports/cash-reconciliation/check', [ReportingController::class, 'checkCashReconciliation']);
         Route::get('/reports/passenger-analytics', [ReportingController::class, 'passengerAnalytics']);
         Route::get('/reports/route-statistics', [ReportingController::class, 'routeStatistics']);
+
+        // FAQ Management Routes
+        Route::apiResource('faqs', FaqController::class)->except(['create', 'edit','show']);
     });
 
 
@@ -130,6 +135,8 @@ Route::middleware('auth:sanctum', 'identify.company')->prefix('v1')->group(funct
 
         //contact form route
         Route::post('/contact', [ContactFormController::class, 'submitContactForm']);
+        //faq route
+        Route::get('/faqs', [PassengerFaqController::class, 'index']);
     });
 
     // **--- Driver Routes ---

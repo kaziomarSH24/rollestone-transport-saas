@@ -14,7 +14,14 @@ class DashboardController extends Controller
     public function __construct(DashboardService $dashboardService)
     {
         $this->dashboardService = $dashboardService;
-        //  $this->middleware('can:view dashboard');
+         $this->middleware('can:view dashboard');
+    }
+
+    //dashboard stats
+     public function getStats()
+    {
+        $stats = $this->dashboardService->getDashboardStats();
+        return response_success('Dashboard stats retrieved successfully.', $stats);
     }
 
     /**

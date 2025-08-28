@@ -17,4 +17,10 @@ class Journey extends Model
     {
         return $this->belongsTo(Driver::class);
     }
+
+    //relationship with Transaction
+    public function transaction()
+    {
+        return $this->hasMany(Transaction::class);
+    }
 }

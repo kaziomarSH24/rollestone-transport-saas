@@ -23,7 +23,7 @@ class LiveDashboardResource extends JsonResource
             'direction' => $this->trip->direction,
             'departure_time' => Carbon::parse($this->trip->departure_time)->format('h:i A'),
             'driver_name' => $this->driver->user->name,
-            'passengers' => "0/50",
+            'passengers' => $this->passenger_count ?? 0,
             'progress' => $this->progress,
             'status' => $this->status,
         ];

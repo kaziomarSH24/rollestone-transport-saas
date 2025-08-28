@@ -90,6 +90,7 @@ class RolesAndPermissionsSeeder extends Seeder
             ],
             'Settings Management' => [
                 'manage settings',
+                'manage faqs',
             ],
 
             'Message Management' => [

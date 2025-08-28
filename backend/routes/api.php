@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\V1\Auth\VerificationController;
 use App\Http\Controllers\Api\V1\Driver\JourneyController as DriverJourneyController;
 use App\Http\Controllers\Api\V1\Driver\TripController as DriverTripController;
 use App\Http\Controllers\api\V1\Passenger\AlertController;
+use App\Http\Controllers\Api\V1\Passenger\ContactFormController;
 use App\Http\Controllers\Api\V1\Passenger\PaymentController;
 use App\Http\Controllers\Api\V1\Passenger\RoutesController;
 use App\Http\Controllers\Api\V1\TransactionController;
@@ -126,6 +127,9 @@ Route::middleware('auth:sanctum', 'identify.company')->prefix('v1')->group(funct
         Route::post('/alerts/toggle', [AlertController::class, 'toggleAlert']);
         Route::post('/alerts/fcm-token', [AlertController::class, 'updateFcmToken']);
         Route::get('/alerts/my-alerts', [AlertController::class, 'myAlerts']);
+
+        //contact form route
+        Route::post('/contact', [ContactFormController::class, 'submitContactForm']);
     });
 
     // **--- Driver Routes ---

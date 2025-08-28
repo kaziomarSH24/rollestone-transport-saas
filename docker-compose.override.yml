@@ -35,4 +35,4 @@ services:
       dockerfile: Dockerfile
     image: my-bus-ticket-app # Use the same local image name
     ports:
-      - "8888:8080"
+      - "8989:8080"

@@ -65,6 +65,7 @@ Route::middleware('auth:sanctum', 'identify.company')->prefix('v1')->group(funct
     Route::prefix('admin')->name('api.v1.admin.')->group(function () {
         //dashboard routes
         Route::get('/dashboard/live-data', [DashboardController::class, 'getLiveData'])->name('dashboard.liveData');
+        Route::get('/dashboard/stats', [DashboardController::class, 'getStats'])->name('dashboard.stats');
 
         //driver management routes
         Route::apiResource('drivers', DriverController::class)->except(['create', 'edit']);

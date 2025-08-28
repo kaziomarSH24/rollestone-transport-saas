@@ -3,10 +3,87 @@
 namespace App\Services\Admin;
 
 use App\Models\Journey;
+use App\Models\Transaction;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class DashboardService
 {
+
+    /**
+     * Get the main statistics for the live dashboard cards.
+     */
+    public function getDashboardStats(): array
+    {
+        $today = Carbon::today();
+        $yesterday = Carbon::yesterday();
+
+        $activeTrips = Journey::where('status', 'Ongoing')
+            ->whereDate('journey_date', $today)
+            ->count();
+
+
+        $totalPassengersToday = Transaction::where('type', 'TripFare')
+            ->whereDate('created_at', $today)
+            ->get()
+            ->sum(function ($transaction) {
+                $details = json_decode($transaction->fare_details, true);
+                return collect($details)->sum('quantity');
+            });
+        $totalPassengersYesterday = Transaction::where('type', 'TripFare')
+            ->whereDate('created_at', $yesterday)
+            ->get()
+            ->sum(function ($transaction) {
+                $details = json_decode($transaction->fare_details, true);
+                return collect($details)->sum('quantity');
+            });
+
+        if ($totalPassengersYesterday == 0) {
+            $passengerChange = $totalPassengersToday > 0 ? 100 : 0;
+        } else {
+            $passengerChange = (($totalPassengersToday - $totalPassengersYesterday) / $totalPassengersYesterday) * 100;
+        }
+
+
+        $revenueToday = Transaction::where('type', 'TripFare')
+            ->whereDate('created_at', $today)
+            ->sum(DB::raw('ABS(amount)'));
+
+
+
+        $revenueYesterday = Transaction::where('type', 'TripFare')
+            ->whereDate('created_at', $yesterday)
+            ->sum(DB::raw('ABS(amount)'));
+
+        if ($revenueYesterday == 0) {
+            $percentageChange = $revenueToday > 0 ? 100 : 0;
+        } else {
+            $percentageChange = (($revenueToday - $revenueYesterday) / $revenueYesterday) * 100;
+        }
+
+
+        $activeDrivers = Journey::where('status', 'Ongoing')
+            ->whereDate('journey_date', $today)
+            ->distinct('driver_id')
+            ->count('driver_id');
+
+        return [
+            'active_trips' => $activeTrips,
+            'total_passengers' =>[
+                'today' => $totalPassengersToday,
+                'yesterday' => $totalPassengersYesterday,
+                'percentage_change' => round($passengerChange, 2) . '%',
+                'is_increase' => $passengerChange >= 0,
+            ],
+            'revenue' => [
+                'today' => number_format($revenueToday),
+                'yesterday' => number_format($revenueYesterday),
+                'percentage_change' => round($percentageChange, 2) . '%',
+                'is_increase' => $percentageChange >= 0,
+            ],
+            'active_drivers' => $activeDrivers,
+        ];
+    }
     /**
      * Get data for the live trip dashboard, including progress percentage.
      */
@@ -18,13 +95,27 @@ class DashboardService
 
         $journeys = Journey::whereDate('journey_date', Carbon::today())
             ->with(['trip.route.stops', 'driver.user'])
+            ->withCount('transaction')
             ->get();
 
-
         $journeys->each(function ($journey) {
-            $journey->progress = $this->calculateProgressPercentage($journey) ?? 0;
+            switch ($journey->status) {
+                case 'ongoing':
+                    $journey->progress = $this->calculateProgressPercentage($journey);
+                    $journey->passenger_count = $journey->transaction->sum(function ($transaction) {
+                        $details = json_decode($transaction->fare_details, true);
+                        return collect($details)->sum('quantity');
+                    });
+                    break;
+                case 'completed':
+                    $journey->progress = 100;
+                    $journey->passenger_count = $journey->transaction_count;
+                    break;
+                default:
+                    $journey->progress = 0;
+                    break;
+            }
         });
-
         return $journeys;
     }
 

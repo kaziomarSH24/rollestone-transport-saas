@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Auth\PasswordController;
 use App\Http\Controllers\Api\V1\Auth\ProfileController;
 use App\Http\Controllers\Api\V1\Auth\VerificationController;
+use App\Http\Controllers\api\V1\CompanyListController;
 use App\Http\Controllers\Api\V1\Driver\JourneyController as DriverJourneyController;
 use App\Http\Controllers\Api\V1\Driver\TripController as DriverTripController;
 use App\Http\Controllers\api\V1\Passenger\AlertController;
@@ -43,7 +44,10 @@ Route::middleware('identify.company')->prefix('v1')->group(function () {
 
         //driver login
         Route::post('/driver/login', [\App\Http\Controllers\Api\V1\Driver\AuthController::class, 'login'])->name('api.v1.driver.auth.login');
+
     });
+    //company list
+        Route::get('/companies', [CompanyListController::class, 'index'])->name('api.v1.companies.index');
 });
 
 // **--- Protected Routes (User must be logged in) ---

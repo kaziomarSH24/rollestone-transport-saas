@@ -70,6 +70,10 @@ class CompanyService extends BaseService
             // Create the user
              $adminUser = User::create($userData);
 
+             $userId = $adminUser->id;
+             //update company user_id field
+             $company->user_id = $userId;
+             $company->save();
             $adminUser->assignRole('CompanyAdmin');
 
 

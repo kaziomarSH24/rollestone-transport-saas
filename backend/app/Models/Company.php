@@ -40,4 +40,10 @@ class Company extends Model
     {
         return $this->hasMany(User::class);
     }
+
+    //company admin user
+    public function owner()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }

@@ -29,6 +29,10 @@ use App\Http\Controllers\Api\V1\TransactionController;
 use App\Http\Controllers\Api\V1\WebhookController;
 use App\Models\Message;
 
+
+//**---company list---
+Route::get('/v1/companies', [CompanyListController::class, 'index'])->name('api.v1.companies.index');
+
 // **--- Public Routes (Authentication) ---
 Route::middleware('identify.company')->prefix('v1')->group(function () {
     Route::prefix('auth')->group(function () {
@@ -44,11 +48,9 @@ Route::middleware('identify.company')->prefix('v1')->group(function () {
 
         //driver login
         Route::post('/driver/login', [\App\Http\Controllers\Api\V1\Driver\AuthController::class, 'login'])->name('api.v1.driver.auth.login');
-
     });
-    //company list
-        Route::get('/companies', [CompanyListController::class, 'index'])->name('api.v1.companies.index');
 });
+
 
 // **--- Protected Routes (User must be logged in) ---
 Route::middleware('auth:sanctum', 'identify.company')->prefix('v1')->group(function () {
@@ -113,7 +115,7 @@ Route::middleware('auth:sanctum', 'identify.company')->prefix('v1')->group(funct
         Route::get('/reports/route-statistics', [ReportingController::class, 'routeStatistics']);
 
         // FAQ Management Routes
-        Route::apiResource('faqs', FaqController::class)->except(['create', 'edit','show']);
+        Route::apiResource('faqs', FaqController::class)->except(['create', 'edit', 'show']);
     });
 
 

@@ -75,7 +75,7 @@ class User extends Authenticatable
                 if ($value) {
                     return Storage::disk('public')->url($value);
                 }
-                return 'https://ui-avatars.com/api/?background=random&format=svg&name=' . urlencode($this->name);
+                return 'https://ui-avatars.com/api/?background=random&color=ffffff&bold=true&rounded=true&size=512&format=png&name=' . urlencode($this->name);
             },
         );
     }
@@ -120,7 +120,7 @@ class User extends Authenticatable
     //relationship with device tokens
     public function deviceTokens(): HasMany
     {
-        return $this->hasMany(DeviceToken::class);
+        return $this->hasMany(DeviceToken::class, 'user_id', 'id');
     }
 
 }

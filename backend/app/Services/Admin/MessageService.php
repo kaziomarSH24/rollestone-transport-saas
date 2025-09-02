@@ -6,6 +6,7 @@ use App\Services\BaseService;
 use App\Models\Message;
 use App\Models\User;
 use App\Notifications\Admin\CustomAlert;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 
 class MessageService extends BaseService
@@ -28,17 +29,17 @@ class MessageService extends BaseService
      */
     public function sendMessage(Message $message, string $recipientType): void
     {
-        $recipients = collect();
+        $query = User::whereHas('deviceTokens');
 
         switch ($recipientType) {
             case 'all':
-                $recipients = User::all();
+                $recipients = $query->where('id', '!=', auth()->id())->get();
                 break;
             case 'drivers':
-                $recipients = User::role('Driver')->get();
+                $recipients = $query->role('Driver')->get();
                 break;
             case 'passengers':
-                $recipients = User::role('Passenger')->get();
+                $recipients = $query->role('Passenger')->get();
                 break;
             default:
                 throw new \InvalidArgumentException("Invalid recipient type: {$recipientType}");
@@ -52,7 +53,7 @@ class MessageService extends BaseService
 
     // Get total messages count
     public function getTotalMessagesCount(): int
-    { 
+    {
         return $this->modelClass::count();
     }
     // Get draft messages count
@@ -70,5 +71,4 @@ class MessageService extends BaseService
     {
         return $this->modelClass::where('status', 'sent')->count();
     }
-
 }

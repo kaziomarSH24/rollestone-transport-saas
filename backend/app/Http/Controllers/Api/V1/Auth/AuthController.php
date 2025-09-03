@@ -19,16 +19,20 @@ class AuthController extends Controller
         $this->authService = $authService;
     }
 
+    // Register a new user
     public function register(RegisterRequest $request)
     {
         //avatar image upload
+        $data = $request->validated();
         $imagePath = $this->handleFileUpload($request, 'avatar', 'avatars');
         if ($imagePath) {
-            $request->merge(['avatar' => $imagePath]);
+            $data['avatar'] = $imagePath;
         }
-        $this->authService->register($request->validated());
+        $this->authService->register($data);
         return response_success('User registered. Please check your email for verification.', [], 201);
     }
+
+
 
     public function login(Request $request)
     {
@@ -46,6 +50,7 @@ class AuthController extends Controller
         }
     }
 
+    // Logout the user
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();

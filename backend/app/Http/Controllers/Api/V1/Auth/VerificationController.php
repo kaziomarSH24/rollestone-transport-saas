@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1\Auth;
 use App\Http\Controllers\Controller;
 use App\Services\AuthService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class VerificationController extends Controller
 {
@@ -22,7 +23,7 @@ class VerificationController extends Controller
             'otp' => 'required_without:token|numeric',
             'token' => 'required_without:otp|string',
         ]);
-
+        Log::info($request->all());
         try {
             $data = $this->authService->verify($request->all());
             return response_success('Email verified successfully. You are now logged in.', $data);

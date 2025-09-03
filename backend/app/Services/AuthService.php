@@ -21,6 +21,7 @@ class AuthService
      */
     public function register(array $data): User
     {
+
         // Check if username was provided. If not, generate one.
         if (empty($data['username'])) {
             $data['username'] = $this->generateUniqueUsername($data['name']);
@@ -48,6 +49,7 @@ class AuthService
             'avatar' => $data['avatar'] ?? null,
             'address' => $data['address'] ?? null,
             'qr_code_number' => $data['qr_code_number'],
+            'dob' => $data['dob'] ?? null,
             'status' => 'active',
             'otp' => $otp,
             'verification_token' => $token,

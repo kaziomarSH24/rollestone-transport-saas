@@ -127,4 +127,19 @@ class PaymentController extends Controller
             return response_error($e->getMessage());
         }
     }
+
+    //get passenger payment methods
+    public function getPaymentMethods(Request $request)
+    {
+        try {
+            $paymentMethods = $this->paymentService->getUserPaymentMethods($request->user());
+            $paymentMethods->makeHidden([
+                'fingerprint',
+                'stripe_payment_method_id',
+            ]);
+            return response_success('Payment methods retrieved.', $paymentMethods);
+        } catch (\Exception $e) {
+            return response_error('Failed to retrieve payment methods: ' . $e->getMessage());
+        }
+    }
 }

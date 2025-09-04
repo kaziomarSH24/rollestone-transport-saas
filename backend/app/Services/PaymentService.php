@@ -254,4 +254,10 @@ class PaymentService
         // Mark this card as the default.
         $paymentMethod->update(['is_default' => true]);
     }
+
+    //get user payment methods
+    public function getUserPaymentMethods(User $user)
+    {
+        return $user->paymentMethods()->get();
+    }
 }

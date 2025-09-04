@@ -128,6 +128,7 @@ Route::middleware('auth:sanctum', 'identify.company')->prefix('v1')->group(funct
         // Route::post('/payment/top-up', [PaymentController::class, 'createPaymentIntent']);
         Route::post('/payment/top-up', [PaymentController::class, 'createPaymentSession']);
         Route::post('/payment/refund', [PaymentController::class, 'requestRefund']);
+        Route::get('/payment/methods', [PaymentController::class, 'getPaymentMethods']);
 
         // Routes for passengers
         Route::get('/routes', [RoutesController::class, 'index'])->name('routes.index');

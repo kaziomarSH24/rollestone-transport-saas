@@ -23,6 +23,10 @@ class ProfileController extends Controller
     public function me(Request $request)
     {
         $user = $request->user()->load('roles');
+        //check user role -> passenger
+        if($user->hasRole('Passenger')){
+            $user->load('wallet', 'transactions');
+        }
         $formattedUser = new UserResource($user);
         return response_success('User data fetched successfully.', $formattedUser);
     }

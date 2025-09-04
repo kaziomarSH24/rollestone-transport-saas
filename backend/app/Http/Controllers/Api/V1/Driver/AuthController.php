@@ -18,7 +18,7 @@ class AuthController extends Controller
         $request->validate([
             'staff_number' => 'required|string',
             'pin_code' => 'required|string',
-            // 'fcm_token' => 'nullable|string|max:500'
+            'fcm_token' => 'nullable|string|max:500'
         ]);
 
         $driver = Driver::where('staff_number', $request->staff_number)->first();

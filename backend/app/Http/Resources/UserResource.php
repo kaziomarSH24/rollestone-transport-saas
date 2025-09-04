@@ -43,6 +43,10 @@ class UserResource extends JsonResource
             $this->mergeWhen($this->relationLoaded('roles'), [
                 'permissions' => $this->getAllPermissions()->pluck('name'),
             ]),
+            $this->mergeWhen($this->relationLoaded('transactions'), [
+                'total_Trips' => $this->transactions->where('type', 'TripFare')->count(),
+                'total_spent' => abs(number_format($this->transactions->where('type', 'TripFare')->sum('amount'), 2)),
+            ]),
         ];
     }
 }

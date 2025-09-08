@@ -127,4 +127,42 @@ class PaymentController extends Controller
             return response_error($e->getMessage());
         }
     }
+
+    //get passenger payment methods
+    public function getPaymentMethods(Request $request)
+    {
+        try {
+            $paymentMethods = $this->paymentService->getUserPaymentMethods($request->user());
+            $paymentMethods->makeHidden([
+                'fingerprint',
+                'stripe_payment_method_id',
+            ]);
+            return response_success('Payment methods retrieved.', $paymentMethods);
+        } catch (\Exception $e) {
+            return response_error('Failed to retrieve payment methods: ' . $e->getMessage());
+        }
+    }
+
+    //Remove payment method
+    public function removePaymentMethod(Request $request)
+    {
+        $request->validate(['payment_method_id' => 'required|integer']);
+        try {
+            $this->paymentService->removePaymentMethod($request->user(), $request->payment_method_id);
+            return response_success('Payment method removed successfully.');
+        } catch (\Exception $e) {
+            return response_error('Failed to remove payment method: ' . $e->getMessage());
+        }
+    }
+
+    //auto top up activa or deactivator
+    public function toggleAutoTopUp(Request $request)
+    {
+        $user = $request->user();
+        $wallet = $user->wallet;
+        $wallet->auto_topup_enabled = !$wallet->auto_topup_enabled;
+        $wallet->save();
+        return response_success('Auto top-up setting updated.', ['auto_topup_enabled' => $wallet->auto_topup_enabled]);
+    }
+
 }

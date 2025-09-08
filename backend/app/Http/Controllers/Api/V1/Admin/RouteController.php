@@ -24,6 +24,13 @@ class RouteController extends Controller
         $this->middleware('can:delete routes')->only(['destroy']);
     }
 
+    //route state
+    public function getRouteStates()
+    {
+        $states = Route::ROUTE_STATES;
+        return response_success('Route states retrieved successfully.', $states);
+    }
+
     /**
      * Display a listing of the resource.
      */

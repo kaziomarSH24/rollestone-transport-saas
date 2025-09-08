@@ -59,7 +59,7 @@ class CustomAlert extends Notification implements ShouldQueue
      */
     public function toFirebase(object $notifiable): array
     {
-        
+
         $tokens = $notifiable->deviceTokens->pluck('token')->toArray();
 
         return [

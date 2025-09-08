@@ -26,9 +26,10 @@ class RoutesController extends Controller
     public function index(Request $request)
     {
         // Fetch routes based on the company_id from the request
+        $status = $request->query('status', false);
         try {
 
-            $routes = $this->listService->getRoutesWithSummary();
+            $routes = $this->listService->getRoutesWithSummary($status);
             return RouteSummaryResource::collection($routes);
             if ($routes->isEmpty()) {
                 return response()->json(['message' => 'No active routes found'], 404);

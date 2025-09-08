@@ -22,7 +22,8 @@ class CompanyListController extends Controller
                 'users.name as owner_name',
                 'users.email as owner_email',
                 'users.avatar as company_logo',
-                'users.address as owner_address'
+                'users.address as owner_address',
+                'users.phone_number as owner_phone_number'
             )
             ->get();
             $companies = $companies->map(function ($company) {

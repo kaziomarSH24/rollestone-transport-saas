@@ -27,17 +27,17 @@ class AlertController extends Controller
             $userAlerts = $passenger->tripAlerts()->pluck('trip_id')->toArray();
 
             // Get routes with their trips grouped by direction
-            $routes = Route::with(['trips' => function($query) {
+            $routes = Route::with(['trips' => function ($query) {
                 $query->where('is_active', 1)->orderBy('departure_time');
             }])->get();
 
-            $data = $routes->map(function($route) use ($userAlerts) {
+            $data = $routes->map(function ($route) use ($userAlerts) {
                 // Group trips by direction for this route
                 $inboundTrips = $route->trips->where('direction', 'inbound');
                 $outboundTrips = $route->trips->where('direction', 'outbound');
 
                 // Extract and format times with alert status
-                $inboundTimes = $inboundTrips->map(function($trip) use ($userAlerts) {
+                $inboundTimes = $inboundTrips->map(function ($trip) use ($userAlerts) {
                     return [
                         'trip_id' => $trip->id,
                         'time' => date('g:i A', strtotime($trip->departure_time)),
@@ -45,7 +45,7 @@ class AlertController extends Controller
                     ];
                 })->values();
 
-                $outboundTimes = $outboundTrips->map(function($trip) use ($userAlerts) {
+                $outboundTimes = $outboundTrips->map(function ($trip) use ($userAlerts) {
                     return [
                         'trip_id' => $trip->id,
                         'time' => date('g:i A', strtotime($trip->departure_time)),
@@ -59,7 +59,7 @@ class AlertController extends Controller
                     'inbound_times' => $inboundTimes,
                     'outbound_times' => $outboundTimes,
                 ];
-            })->filter(function($route) {
+            })->filter(function ($route) {
                 return $route['inbound_times']->count() > 0 || $route['outbound_times']->count() > 0;
             })->values();
 
@@ -68,84 +68,63 @@ class AlertController extends Controller
                 'message' => 'Alert times retrieved successfully.',
                 'data' => $data
             ]);
-
         } catch (\Exception $e) {
             return response()->json(['message' => 'Error fetching alerts: ' . $e->getMessage()], 500);
         }
     }
 
     // Toggle alert for a specific trip
-    public function toggleAlert(Request $request)
+    public function toggleAlerts(Request $request)
     {
         try {
             $validator = Validator::make($request->all(), [
-                'trip_id' => 'required|exists:trips,id',
-                'notify_before_minutes' => 'nullable|integer|min:1|max:60'
+                'trip_ids' => 'required|array',
+                'trip_ids.*' => 'exists:trips,id',
             ]);
 
             if ($validator->fails()) {
                 return response_error($validator->errors()->first(), $validator->errors()->toArray(), 422);
             }
 
-
             $passenger = $request->user();
-            $tripId = $request->trip_id;
-            $notifyBefore = $request->notify_before_minutes ?? 5;
+            $tripIds = $request->trip_ids;
 
-            // Check if alert already exists
-            $existingAlert = $passenger->tripAlerts()->where('trip_id', $tripId)->first();
+            $results = [];
 
-            if ($existingAlert) {
-                // Remove alert
-                $existingAlert->delete();
-                $message = 'Alert disabled successfully.';
-                $isActive = false;
-            } else {
-                // Add alert
-                $passenger->tripAlerts()->create([
-                    'company_id' => $passenger->company_id,
-                    'trip_id' => $tripId,
-                    'notify_before_minutes' => $notifyBefore
-                ]);
-                $message = 'Alert enabled successfully.';
-                $isActive = true;
+            foreach ($tripIds as $tripId) {
+                $existingAlert = $passenger->tripAlerts()->where('trip_id', $tripId)->first();
+
+                if ($existingAlert) {
+                    // Remove alert
+                    $existingAlert->delete();
+                    $results[] = [
+                        'trip_id' => $tripId,
+                        'is_alert_active' => false,
+                        'message' => 'Alert disabled successfully.'
+                    ];
+                } else {
+                    // Add alert
+                    $passenger->tripAlerts()->create([
+                        'company_id' => $passenger->company_id,
+                        'trip_id' => $tripId,
+                    ]);
+                    $results[] = [
+                        'trip_id' => $tripId,
+                        'is_alert_active' => true,
+                        'message' => 'Alert enabled successfully.'
+                    ];
+                }
             }
 
             return response()->json([
                 'ok' => true,
-                'message' => $message,
-                'data' => [
-                    'trip_id' => $tripId,
-                    'is_alert_active' => $isActive,
-                    'notify_before_minutes' => $notifyBefore
-                ]
+                'data' => $results
             ]);
-
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Error toggling alert: ' . $e->getMessage()], 500);
+            return response()->json(['message' => 'Error toggling alerts: ' . $e->getMessage()], 500);
         }
     }
 
-    // Update FCM token for push notifications
-    public function updateFcmToken(Request $request)
-    {
-        try {
-            $request->validate([
-                'fcm_token' => 'required|string'
-            ]);
-
-            $passenger = $request->user();
-            $passenger->update(['fcm_token' => $request->fcm_token]);
-
-            return response()->json([
-                'ok' => true,
-                'message' => 'FCM token updated successfully.'
-            ]);
-
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Error updating FCM token: ' . $e->getMessage()], 500);
-        }
-    }
 
     // Get user's active alerts
     public function myAlerts(Request $request)
@@ -153,7 +132,7 @@ class AlertController extends Controller
         try {
             $passenger = $request->user();
 
-            $alerts = $passenger->tripAlerts()->with(['trip.route'])->get()->map(function($alert) {
+            $alerts = $passenger->tripAlerts()->with(['trip.route'])->get()->map(function ($alert) {
                 return [
                     'id' => $alert->id,
                     'trip_id' => $alert->trip_id,
@@ -170,9 +149,23 @@ class AlertController extends Controller
                 'message' => 'Active alerts retrieved successfully.',
                 'data' => $alerts
             ]);
-
         } catch (\Exception $e) {
             return response()->json(['message' => 'Error fetching alerts: ' . $e->getMessage()], 500);
         }
+    }
+
+    //update notify before timeing for alert
+    public function updateAlertTiming(Request $request)
+    {
+        $user = $request->user();
+        $validator = Validator::make($request->all(), [
+            'alert_timing' => 'required|integer|min:1|max:60'
+        ]);
+        if ($validator->fails()) {
+            return response_error($validator->errors()->first(), $validator->errors()->toArray(), 422);
+        }
+        $user->alert_timing = $request->alert_timing;
+        $user->save();
+        return response_success('Alert timing updated successfully.', ['alert_timing' => $user->alert_timing]);
     }
 }

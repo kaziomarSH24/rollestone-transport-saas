@@ -48,7 +48,7 @@ class ScheduleTripAlerts extends Command
             $departureTime = Carbon::today()->setTimeFromTimeString($trip->departure_time);
 
             // Calculate notification time (departure time minus notify_before_minutes)
-            $notificationTime = $departureTime->subMinutes($alert->notify_before_minutes);
+            $notificationTime = $departureTime->subMinutes($alert->user->alert_timing);
 
             // Only schedule if notification time is in the future and within next 24 hours
             if ($notificationTime->isAfter($now) && $notificationTime->isBefore($now->copy()->addDay())) {

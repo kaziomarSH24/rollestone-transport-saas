@@ -32,6 +32,7 @@ class TransactionService
                 'refund' => $query->whereIn('type', ['Refund', 'CashRefund']),
                 'topups' => $query->whereIn('type', ['TopUp', 'CashTopUp', 'StripeTopUp', 'AutoTopUp']),
                 'trips' => $query->where('type', 'TripFare'),
+                'complete' => $query->where('type', 'TripFare')->where('status', 'succeeded'),
                 default => null, // 'All' filter does nothing.
             };
         }

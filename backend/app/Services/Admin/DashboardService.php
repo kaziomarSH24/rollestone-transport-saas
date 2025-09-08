@@ -87,13 +87,18 @@ class DashboardService
     /**
      * Get data for the live trip dashboard, including progress percentage.
      */
-    public function getLiveDashboardData()
+    public function getLiveDashboardData($filter = 'all')
     {
         // 23.817190217017178, 90.41037310255314
         // 23.773530466373803, 90.40149041636843
         // dd( getDistance(23.81719021, 90.41037310, 23.81082853, 90.40357080) );
 
-        $journeys = Journey::whereDate('journey_date', Carbon::today())
+        $query = Journey::query();
+        if ($filter !== 'all') {
+            $query->where('status', $filter);
+        }
+
+        $journeys = $query->whereDate('journey_date', Carbon::today())
             ->with(['trip.route.stops', 'driver.user'])
             ->withCount('transaction')
             ->get();

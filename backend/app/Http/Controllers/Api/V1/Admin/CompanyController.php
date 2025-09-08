@@ -36,7 +36,18 @@ class CompanyController extends BaseController
     {
         // Fetch all companies with pagination
         $perPage = $request->get('per_page', 15);
-        $companies = $this->companyService->getAll(['user'], $perPage);
+        $search = $request->get('search', null);
+        if ($search) {
+            $queryCallback = function ($query) use ($search) {
+                $query->whereHas('user', function ($q) use ($search) {
+                    $q->where('name', 'like', "%$search%")
+                      ->orWhere('email', 'like', "%$search%");
+                })->orWhere('company_name', 'like', "%$search%");
+            };
+        } else {
+            $queryCallback = null;
+        }
+        $companies = $this->companyService->getAll(['user'], $perPage, $queryCallback);
 
         if ($companies->isEmpty()) {
             return response_error('No companies found.', [], 404);

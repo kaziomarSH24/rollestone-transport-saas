@@ -33,8 +33,19 @@ class DriverController extends BaseController
     {
         try{
             $perPage = $request->get('per_page', 15);
+            $search = $request->get('search', null);
+            if ($search) {
+                $queryCallback = function ($query) use ($search) {
+                    $query->whereHas('user', function ($q) use ($search) {
+                        $q->where('name', 'like', "%$search%")
+                          ->orWhere('email', 'like', "%$search%");
+                    })->orWhere('license_number', 'like', "%$search%");
+                };
+            }else {
+                $queryCallback = null;
+            }
 
-        $drivers = $this->driverService->getAll(['user'], $perPage);
+        $drivers = $this->driverService->getAll(['user'], $perPage, $queryCallback);
         if ($drivers->isEmpty()) {
             return response_error('No drivers found.', [], 404);
         }

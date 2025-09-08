@@ -248,10 +248,42 @@ class PaymentService
                 'stripe_payment_method_id' => $stripePaymentMethod->id,
                 'card_brand' => $stripePaymentMethod->card->brand,
                 'last_four' => $stripePaymentMethod->card->last4,
+                'exp_month' => $stripePaymentMethod->card->exp_month,
+                'exp_year' => $stripePaymentMethod->card->exp_year,
             ]
         );
 
         // Mark this card as the default.
         $paymentMethod->update(['is_default' => true]);
+    }
+
+    //get user payment methods
+    public function getUserPaymentMethods(User $user)
+    {
+        return $user->paymentMethods()->get();
+    }
+
+    //remove user payment method
+    public function removePaymentMethod(User $user, string $paymentMethodId): void
+    {
+        $paymentMethod = $user->paymentMethods()->where('id', $paymentMethodId)->first();
+        if (!$paymentMethod) {
+            throw new \Exception('Payment method not found.');
+        }
+        $this->setStripeKeyForUser($user);
+        // Detach from Stripe
+        $stripePaymentMethod = PaymentMethod::retrieve($paymentMethod->stripe_payment_method_id);
+        $stripePaymentMethod->detach();
+        // Remove from our database
+        $paymentMethod->delete();
+
+        // If the removed card was the default, set another card as default if available
+        if ($paymentMethod->is_default) {
+            $newDefault = $user->paymentMethods()->first();
+            if ($newDefault) {
+                $newDefault->update(['is_default' => true]);
+            }
+
+        }
     }
 }

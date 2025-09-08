@@ -34,6 +34,13 @@ class PassengerController extends Controller
         $this->middleware('can:manage passenger wallet')->only(['topUpWallet', 'refund']);
     }
 
+    //Dashboard stats for passengers
+    public function getStats()
+    {
+        $passengerDashboardStats = $this->passengerService->getPassengerStats();
+        return response_success('Passenger stats retrieved successfully.', $passengerDashboardStats);
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -42,10 +49,16 @@ class PassengerController extends Controller
         try {
 
             $perPage = $request->get('per_page', 15);
+            $search = $request->get('search', null);
 
-            $queryCallback = function ($query) {
+            $queryCallback = function ($query) use ($search) {
                 $query->role('Passenger');
-            };
+                if($search) {
+                    $query->where('name', 'like', "%$search%")
+                          ->orWhere('email', 'like', "%$search%")
+                          ->orWhere('username', 'like', "%$search%");
+                    }
+                };
 
             $passengers = $this->passengerService->getAll(['paymentMethods', 'wallet'], $perPage, $queryCallback);
 

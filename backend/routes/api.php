@@ -85,6 +85,7 @@ Route::middleware('auth:sanctum', 'identify.company')->prefix('v1')->group(funct
         //passenger wallet top-up
         Route::post('passengers/{passenger}/top-up', [PassengerController::class, 'topUpWallet'])->name('passengers.topUp');
         Route::post('/passengers/{passenger}/refund', [PassengerController::class, 'refund'])->name('passengers.refund');
+        Route::get('/passengers/dashboard/state', [PassengerController::class, 'getStats'])->name('passengers.stats');
 
 
         //company management routes
@@ -129,6 +130,8 @@ Route::middleware('auth:sanctum', 'identify.company')->prefix('v1')->group(funct
         Route::post('/payment/top-up', [PaymentController::class, 'createPaymentSession']);
         Route::post('/payment/refund', [PaymentController::class, 'requestRefund']);
         Route::get('/payment/methods', [PaymentController::class, 'getPaymentMethods']);
+        Route::post('/payment/remove-method', [PaymentController::class, 'removePaymentMethod']);
+        Route::post('/payment/toggleAutoTopup', [PaymentController::class, 'toggleAutoTopUp']);
 
         // Routes for passengers
         Route::get('/routes', [RoutesController::class, 'index'])->name('routes.index');
@@ -136,9 +139,9 @@ Route::middleware('auth:sanctum', 'identify.company')->prefix('v1')->group(funct
 
         //trip alert routes
         Route::get('/alerts', [AlertController::class, 'index']);
-        Route::post('/alerts/toggle', [AlertController::class, 'toggleAlert']);
-        Route::post('/alerts/fcm-token', [AlertController::class, 'updateFcmToken']);
+        Route::post('/alerts/toggle', [AlertController::class, 'toggleAlerts']);
         Route::get('/alerts/my-alerts', [AlertController::class, 'myAlerts']);
+        Route::put('/alerts/update-timing', [AlertController::class, 'updateAlertTiming']);
 
         //contact form route
         Route::post('/contact', [ContactFormController::class, 'submitContactForm']);

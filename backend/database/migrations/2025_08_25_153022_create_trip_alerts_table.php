@@ -16,7 +16,6 @@ return new class extends Migration
             $table->foreignId('company_id')->constrained('companies')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('trip_id')->constrained('trips')->onDelete('cascade');
-            $table->unsignedInteger('notify_before_minutes')->default(5);
             $table->timestamps();
 
             $table->unique(['user_id', 'trip_id']);

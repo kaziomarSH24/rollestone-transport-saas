@@ -27,6 +27,7 @@ class RouteSummaryResource extends JsonResource
             'time_range' => "{$firstTrip} - {$lastTrip}",
             'first_trip' => "First trip: {$firstTrip}",
             'last_trip' => "Last trip: {$lastTrip}",
+            'status' => $this->status,
         ];
     }
 }

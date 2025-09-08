@@ -33,6 +33,9 @@ class UserResource extends JsonResource
 
             $this->mergeWhen($this->relationLoaded('wallet'), [
                 'balance' => $this->wallet ? number_format($this->wallet->balance, 2) : '0.00',
+                'is_auto_top_up_enabled' => $this->wallet ? (bool)$this->wallet->auto_topup_enabled : false,
+                'auto_top_up_amount' => $this->wallet ? number_format($this->wallet->auto_topup_amount, 2) : '0.00',
+                'auto_top_up_threshold' => $this->wallet ? number_format($this->wallet->auto_topup_threshold, 2) : '0.00',
             ]),
 
             $this->mergeWhen($this->relationLoaded('paymentMethods'), [

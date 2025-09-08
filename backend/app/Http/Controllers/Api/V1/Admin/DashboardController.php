@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Admin\LiveDashboardResource;
 use App\Services\Admin\DashboardService;
 use Illuminate\Http\Request;
+use Laravel\Cashier\Exceptions\IncompletePayment;
+use Exception;
 
 
 class DashboardController extends Controller
@@ -27,9 +29,16 @@ class DashboardController extends Controller
     /**
      * Get live data for the admin dashboard.
      */
-    public function getLiveData()
+    public function getLiveData(Request $request)
     {
-        $liveJourneys = $this->dashboardService->getLiveDashboardData();
+        $request->validate([
+            'filter' => 'sometimes|in:all,ongoing,completed,blocked,cancelled',
+        ]);
+        $filter = $request->query('filter', 'all'); // 'all', 'ongoing', 'completed'
+        $liveJourneys = $this->dashboardService->getLiveDashboardData($filter);
+        if ($liveJourneys->isEmpty()) {
+            return response_error('No live trips found.', [], 404);
+        }
         return LiveDashboardResource::collection($liveJourneys);
     }
 }

@@ -40,7 +40,7 @@ class PaymentService
         return $customer;
     }
 
-    public function createCardSetupCheckoutSession(User $user): CheckoutSession
+    public function createCardSetupCheckoutSession(User $user, $successUrl, $cancelUrl): CheckoutSession
     {
         $this->setStripeKeyForUser($user);
         $customer = $this->getOrCreateStripeCustomer($user);
@@ -48,8 +48,8 @@ class PaymentService
             'customer' => $customer->id,
             'mode' => 'setup',
             'payment_method_types' => ['card'],
-            'success_url' => 'https://yourapp.com/payment-method/success',
-            'cancel_url' => 'https://yourapp.com/payment-method/cancel',
+            'success_url' => $successUrl ?? 'https://yourapp.com/payment-method/success',
+            'cancel_url' => $cancelUrl ?? 'https://yourapp.com/payment-method/cancel',
         ]);
     }
 
@@ -261,6 +261,19 @@ class PaymentService
     public function getUserPaymentMethods(User $user)
     {
         return $user->paymentMethods()->get();
+    }
+
+    //set another card as default
+    public function setDefaultPaymentMethod(User $user, string $paymentMethodId): void
+    {
+        $paymentMethod = $user->paymentMethods()->where('id', $paymentMethodId)->first();
+        if (!$paymentMethod) {
+            throw new \Exception('Payment method not found.');
+        }
+        // Set all other cards to not be default
+        $user->paymentMethods()->update(['is_default' => false]);
+        // Set the selected card as default
+        $paymentMethod->update(['is_default' => true]);
     }
 
     //remove user payment method

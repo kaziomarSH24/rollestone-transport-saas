@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1\Passenger;
 use App\Http\Controllers\Controller;
 use App\Services\PaymentService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class PaymentController extends Controller
@@ -33,8 +34,31 @@ class PaymentController extends Controller
 
     public function createCardSetupSession(Request $request)
     {
-        $checkoutSession = $this->paymentService->createCardSetupCheckoutSession($request->user());
+
+        $successUrl = env('APP_URL') . "/api/v1/payment-method/setup/success";
+        $cancelUrl = env('APP_URL'). "/api/v1/payment-method/setup/cancel";
+        $checkoutSession = $this->paymentService->createCardSetupCheckoutSession($request->user(), $successUrl, $cancelUrl);
         return response_success('Card setup session created.', ['setup_url' => $checkoutSession->url]);
+    }
+
+    //success response for success url
+    public function cardSetupSuccess(Request $request)
+    {
+        $response = [
+            'message' => 'Card setup completed successfully.',
+            'status' => 'success',
+        ];
+        return response($response);
+    }
+
+    //cancel response for cancel url
+    public function cardSetupCancel(Request $request)
+    {
+        $response = [
+            'message' => 'Card setup was cancelled.',
+            'status' => 'cancelled',
+        ];
+        return response($response);
     }
 
 
@@ -140,6 +164,18 @@ class PaymentController extends Controller
             return response_success('Payment methods retrieved.', $paymentMethods);
         } catch (\Exception $e) {
             return response_error('Failed to retrieve payment methods: ' . $e->getMessage());
+        }
+    }
+
+    //set another card as default
+    public function setDefaultPaymentMethod(Request $request)
+    {
+        $request->validate(['payment_method_id' => 'required|integer']);
+        try {
+            $this->paymentService->setDefaultPaymentMethod($request->user(), $request->payment_method_id);
+            return response_success('Default payment method updated successfully.');
+        } catch (\Exception $e) {
+            return response_error('Failed to update default payment method: ' . $e->getMessage());
         }
     }
 

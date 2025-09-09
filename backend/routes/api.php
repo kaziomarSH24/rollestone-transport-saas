@@ -130,6 +130,7 @@ Route::middleware('auth:sanctum', 'identify.company')->prefix('v1')->group(funct
         Route::post('/payment/top-up', [PaymentController::class, 'createPaymentSession']);
         Route::post('/payment/refund', [PaymentController::class, 'requestRefund']);
         Route::get('/payment/methods', [PaymentController::class, 'getPaymentMethods']);
+        Route::post('/payment/set-default-method', [PaymentController::class, 'setDefaultPaymentMethod']);
         Route::post('/payment/remove-method', [PaymentController::class, 'removePaymentMethod']);
         Route::post('/payment/toggleAutoTopup', [PaymentController::class, 'toggleAutoTopUp']);
 
@@ -189,3 +190,8 @@ Route::post('/v1/stripe/webhook', [WebhookController::class, 'handleStripeWebhoo
 Route::get('/v1/test', function (Request $request) {
     return (new \App\Http\Controllers\TestController)->index();
 })->name('api.v1.test');
+
+//success url for card setup
+Route::get('/v1/payment-method/setup/success', [PaymentController::class, 'cardSetupSuccess'])->name('payment.method.setup.success');
+//cancel url for card setup
+Route::get('/v1/payment-method/setup/cancel', [PaymentController::class, 'cardSetupCancel'])->name('payment.method.setup.cancel');

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1\Driver;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Driver\TripResource;
 use App\Services\Driver\TripService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -48,6 +49,6 @@ class TripController extends Controller
             return response_error('Trip not found or is already active.', [], 404);
         }
 
-        return response_success('Trip found successfully.', $trip);
+        return TripResource::collection(collect([$trip]));
     }
 }

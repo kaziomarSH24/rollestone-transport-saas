@@ -45,7 +45,15 @@ class RoutesController extends Controller
     public function show($routeId)
     {
        try{
-        $route = Route::with(['stops', 'trips', 'fares'])->findOrFail($routeId);
+        $route = Route::with([
+            'stops',
+            'trips',
+            'fares',
+            'journeys' => function ($query) {
+            $query->where('status', 'ongoing');
+            }
+        ])->findOrFail($routeId);
+        // return $route;
          return new RouteDetailResource($route);
        }catch (\Exception $e) {
             return response()->json(['message' => 'Error fetching route details: ' . $e->getMessage()], 500);

@@ -137,7 +137,9 @@ class RolesAndPermissionsSeeder extends Seeder
             'end own trip',
             'validate tickets',
             'view notifications', // Drivers can view notifications.
-            'manage passenger wallet'
+            'manage passenger wallet',
+            'view passengers',
+            'view routes',
         ]);
 
         // Passenger Role -> No special backend permissions.

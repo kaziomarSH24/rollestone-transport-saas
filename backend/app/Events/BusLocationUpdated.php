@@ -35,7 +35,7 @@ class BusLocationUpdated implements ShouldBroadcast
      */
     public function broadcastOn(): array
     {
-        return [new PrivateChannel('journey.' . $this->journeyId)];
+        return [new Channel('journey.' . $this->journeyId)];
     }
 
     /**

@@ -39,8 +39,16 @@ class JourneyController extends Controller
 
     public function start(Request $request, Journey $journey)
     {
+        $request->validate([
+            'latitude' => 'required|numeric|between:-90,90',
+            'longitude' => 'required|numeric|between:-180,180',
+        ]);
+
+        $latitude = $request->input('latitude');
+        $longitude = $request->input('longitude');
+
         try {
-            $journey = $this->journeyService->startJourney($journey, $request->user());
+            $journey = $this->journeyService->startJourney($journey, $request->user(), $latitude, $longitude);
 
             return response_success('Trip started successfully.', $journey);
         } catch (\Exception $e) {
@@ -65,6 +73,22 @@ class JourneyController extends Controller
             return response_error('No Trips found.', [], 404);
         }
         return JourneyResource::collection($schedule);
+    }
+
+    //get the current active journey of the driver
+    public function hasActiveJourney(Request $request)
+    {
+        try {
+            $journey = $this->journeyService->hasActiveJourney($request->user());
+            if (!$journey) {
+                return response_error('No active journey found.', [], 404);
+            }else{
+                $journey = $this->journeyService->getActiveJourneyDetails($request->user());
+            }
+            return (new JourneyResource($journey))->additional(['ok' => true]);
+        } catch (\Exception $e) {
+            return response_error($e->getMessage());
+        }
     }
 
     /**

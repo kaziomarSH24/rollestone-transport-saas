@@ -161,6 +161,9 @@ Route::middleware('auth:sanctum', 'identify.company')->prefix('v1')->group(funct
         Route::post('/journeys/{journey}/start', [DriverJourneyController::class, 'start']);
         Route::post('/journeys/{journey}/end', [DriverJourneyController::class, 'end']);
 
+        //check ongoing journey
+        Route::get('/journeys/active', [DriverJourneyController::class, 'hasActiveJourney']);
+
         Route::post('/journeys/process-payment', [DriverJourneyController::class, 'processPayment']);
         Route::post('/journeys/process-single-payment', [DriverJourneyController::class, 'processSingleUserPayment']);
         Route::post('/journeys/{journey}/update-location', [DriverJourneyController::class, 'updateLocation']);
@@ -187,7 +190,7 @@ Route::post('/v1/stripe/webhook', [WebhookController::class, 'handleStripeWebhoo
 
 
 // test api route
-Route::get('/v1/test', function (Request $request) {
+Route::middleware('auth:sanctum')->get('/v1/test', function (Request $request) {
     return (new \App\Http\Controllers\TestController)->index();
 })->name('api.v1.test');
 

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laravel Reverb Private Channel Tester</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .log-container::-webkit-scrollbar { width: 8px; }
+        .log-container::-webkit-scrollbar-track { background: #1F2937; }
+        .log-container::-webkit-scrollbar-thumb { background: #4B5563; border-radius: 4px; }
+        .log-container::-webkit-scrollbar-thumb:hover { background: #6B7280; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    </style>
+</head>
+<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen">
+
+    <div class="w-full max-w-4xl mx-auto p-6 md:p-8 bg-gray-800 rounded-xl shadow-2xl">
+
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-bold text-cyan-400">Laravel Reverb Private Channel Tester</h1>
+            <div id="status" class="flex items-center space-x-2 bg-gray-700 px-3 py-1 rounded-full">
+                <span class="text-gray-300 text-sm">Status:</span>
+                <div id="status-indicator" class="w-3 h-3 bg-red-500 rounded-full transition-colors duration-300"></div>
+            </div>
+        </div>
+
+        <!-- Configuration Inputs -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+                <label for="reverbUrl" class="block text-sm font-medium text-gray-400 mb-1">Reverb URL</label>
+                <input type="text" id="reverbUrl" value="ws://localhost:8989" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 focus:ring-2 focus:ring-cyan-500 focus:outline-none">
+            </div>
+            <div>
+                <label for="reverbKey" class="block text-sm font-medium text-gray-400 mb-1">Reverb App Key</label>
+                <input type="text" id="reverbKey" placeholder="Your REVERB_APP_KEY" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 focus:ring-2 focus:ring-cyan-500 focus:outline-none">
+            </div>
+            <div>
+                <label for="authEndpoint" class="block text-sm font-medium text-gray-400 mb-1">Broadcasting Auth Endpoint</label>
+                <input type="text" id="authEndpoint" value="http://10.10.10.55:82/broadcasting/auth" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 focus:ring-2 focus:ring-cyan-500 focus:outline-none">
+            </div>
+            <div>
+                <label for="authToken" class="block text-sm font-medium text-gray-400 mb-1">Sanctum API Token (Bearer)</label>
+                <input type="password" id="authToken" placeholder="Your plain-text Sanctum token (e.g., 3|...)" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 focus:ring-2 focus:ring-cyan-500 focus:outline-none">
+            </div>
+             <div>
+                <label for="channelName" class="block text-sm font-medium text-gray-400 mb-1">Private Channel Name (without 'private-')</label>
+                <input type="text" id="channelName" value="journey.14" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 focus:ring-2 focus:ring-cyan-500 focus:outline-none">
+            </div>
+            <div>
+                <label for="eventName" class="block text-sm font-medium text-gray-400 mb-1">Event Name (with leading dot)</label>
+                <input type="text" id="eventName" value=".bus.location.updated" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 focus:ring-2 focus:ring-cyan-500 focus:outline-none">
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex space-x-4 mb-6">
+            <button id="connectBtn" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed">Connect & Subscribe</button>
+            <button id="disconnectBtn" class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed" disabled>Disconnect</button>
+        </div>
+
+        <!-- Live Log -->
+        <div>
+            <div class="flex justify-between items-center mb-2">
+                 <h2 class="text-lg font-semibold text-gray-300">Live Log</h2>
+                 <button id="clearLogBtn" class="text-xs text-gray-400 hover:text-white">Clear Log</button>
+            </div>
+            <pre id="log" class="log-container bg-black rounded-lg p-4 h-64 overflow-y-auto text-sm font-mono whitespace-pre-wrap break-all"></pre>
+        </div>
+
+        <!-- Troubleshooting Guide -->
+        <div class="mt-6 p-4 bg-gray-700 rounded-lg">
+            <h3 class="text-md font-bold text-yellow-400 mb-2">Troubleshooting Guide (যদি 'Failed to fetch' এরর আসে)</h3>
+            <p class="text-xs text-gray-300">এই এররটি একটি সার্ভার-সাইড CORS সমস্যা। আপনার Laravel প্রজেক্টে নিচের বিষয়গুলো চেক করুন:</p>
+            <ul class="list-disc list-inside text-xs text-gray-400 mt-2 space-y-1">
+                <li>আপনার `config/cors.php` ফাইল আছে কি? না থাকলে, তৈরি করুন।</li>
+                <li>`cors.php` ফাইলে, `'paths'` অ্যারে-তে `'broadcasting/auth'` যোগ করা আছে কি?</li>
+                <li>`cors.php` ফাইলে, `'supports_credentials'` এর মান `true` করা আছে কি?</li>
+                <li>`app/Providers/BroadcastServiceProvider.php` ফাইলে `boot()` মেথডের ভেতরে `Broadcast::routes(['middleware' => ['api', 'auth:sanctum']]);` লাইনটি আছে কি?</li>
+                <li>সব পরিবর্তন করার পর, আপনি কি টার্মিনালে `php artisan config:clear` কমান্ডটি চালিয়েছেন?</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/laravel-echo@1.15.3/dist/echo.iife.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pusher-js@8.3.0/dist/web/pusher.min.js"></script>
+
+    <script>
+        // DOM Elements
+        const connectBtn = document.getElementById('connectBtn');
+        const disconnectBtn = document.getElementById('disconnectBtn');
+        const clearLogBtn = document.getElementById('clearLogBtn');
+        const logEl = document.getElementById('log');
+        const statusIndicator = document.getElementById('status-indicator');
+
+        let echoInstance = null;
+
+        const addLog = (message, data = null) => {
+            const time = new Date().toLocaleTimeString();
+            logEl.innerHTML += `[${time}] ${message}` + (data ? `\n${JSON.stringify(data, null, 2)}` : '') + '\n';
+            logEl.scrollTop = logEl.scrollHeight;
+        };
+
+        const setStatus = (status) => {
+            statusIndicator.classList.remove('bg-red-500', 'bg-yellow-500', 'bg-green-500');
+            if (status === 'connecting') {
+                statusIndicator.classList.add('bg-yellow-500');
+            } else if (status === 'connected') {
+                statusIndicator.classList.add('bg-green-500');
+            } else {
+                statusIndicator.classList.add('bg-red-500');
+            }
+        };
+
+        const updateButtonState = (isConnected) => {
+            connectBtn.disabled = isConnected;
+            disconnectBtn.disabled = !isConnected;
+        };
+
+        connectBtn.addEventListener('click', () => {
+            // Get values from inputs
+            const reverbUrl = document.getElementById('reverbUrl').value;
+            const reverbKey = document.getElementById('reverbKey').value;
+            const authEndpoint = document.getElementById('authEndpoint').value;
+            const authToken = document.getElementById('authToken').value;
+            const channelName = document.getElementById('channelName').value;
+            console.log(channelName);
+            const eventName = document.getElementById('eventName').value;
+
+            if (!reverbUrl || !reverbKey || !authEndpoint || !authToken || !channelName || !eventName) {
+                addLog("❌ Error: All fields are required for private channel connection.");
+                return;
+            }
+
+            addLog('🚀 Initializing Laravel Echo for Private Channel...');
+            setStatus('connecting');
+            updateButtonState(true);
+
+            const url = new URL(reverbUrl);
+
+
+
+            echoInstance = new Echo({
+                broadcaster: 'pusher',
+                key: reverbKey,
+                wsHost: url.hostname,
+                wsPort: url.port,
+                wssPort: url.port,
+                forceTLS: url.protocol === 'wss:',
+                cluster: 'mt1',
+                enabledTransports: ['ws', 'wss'],
+                authEndpoint: authEndpoint,
+                auth: {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Accept': 'application/json',
+                    },
+                },
+            });
+
+
+
+            // Bind to global connection events
+            echoInstance.connector.pusher.connection.bind('state_change', (states) => {
+                addLog(`Connection state changed: ${states.previous} -> ${states.current}`);
+                setStatus(states.current);
+                if (states.current === 'connected') {
+                     updateButtonState(true);
+                } else if (['disconnected', 'failed', 'unavailable'].includes(states.current)) {
+                    updateButtonState(false);
+                }
+            });
+
+            echoInstance.connector.pusher.connection.bind('error', (err) => {
+                addLog('❌ Connection Error!', err);
+                if(err.error && err.error.data && err.error.data.type === 'AuthError') {
+                    addLog("🔐 Authorization Error: Server rejected the connection. Check your Sanctum token and server-side CORS/Auth configuration.");
+                } else {
+                    addLog("🔌 Network Error: Could not connect to Reverb. Is the server running? Is the URL correct?");
+                }
+                setStatus('disconnected');
+                updateButtonState(false);
+            });
+
+            // Subscribe to the private channel
+            addLog(`👂 Subscribing to private channel: ${channelName}`);
+            echoInstance.private(channelName)
+                .listen(eventName, (eventData) => {
+                    addLog(`🎉 Event Received on '${eventName}'!`, eventData);
+                })
+                .error((error) => {
+                    addLog(`🚨 Authorization failed for channel! Server response:`, error);
+                    setStatus('connected_auth_error'); // A custom status
+                    statusIndicator.classList.add('bg-orange-500'); // Orange for auth error on channel
+                });
+        });
+
+        disconnectBtn.addEventListener('click', () => {
+            if (echoInstance) {
+                echoInstance.disconnect();
+                addLog('🔌 Disconnected.');
+                echoInstance = null;
+                setStatus('disconnected');
+                updateButtonState(false);
+            }
+        });
+
+        clearLogBtn.addEventListener('click', () => {
+            logEl.innerHTML = '';
+        });
+
+        // Initial state
+        updateButtonState(false);
+        setStatus('disconnected');
+
+    </script>
+</body>
+</html>
+

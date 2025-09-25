@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laravel Reverb Public Channel Tester</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 1. Laravel Echo and Pusher.js libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/laravel-echo@1.15.3/dist/echo.iife.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pusher-js@8.3.0/dist/web/pusher.min.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen p-4">
+    <div class="w-full max-w-2xl bg-gray-800 rounded-xl shadow-2xl p-6 md:p-8">
+        <div class="flex items-center justify-between mb-6">
+            <h1 class="text-2xl font-bold text-cyan-400">Laravel Reverb Tester (Public Channel)</h1>
+            <div class="flex items-center space-x-3">
+                <span class="text-gray-400">Status:</span>
+                <div id="status-indicator" class="w-4 h-4 rounded-full bg-red-500 transition-colors duration-500"></div>
+            </div>
+        </div>
+
+        <!-- Configuration Section -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div>
+                <label for="reverb-url" class="block text-sm font-medium text-gray-400 mb-1">Reverb URL</label>
+                <input type="text" id="reverb-url" class="w-full bg-gray-700 border border-gray-600 rounded-md p-2 focus:ring-2 focus:ring-cyan-500 focus:outline-none" value="ws://localhost:8989">
+            </div>
+            <div>
+                <label for="reverb-key" class="block text-sm font-medium text-gray-400 mb-1">Reverb App Key</label>
+                <input type="text" id="reverb-key" class="w-full bg-gray-700 border border-gray-600 rounded-md p-2 focus:ring-2 focus:ring-cyan-500 focus:outline-none" placeholder="Your REVERB_APP_KEY">
+            </div>
+             <div>
+                <label for="channel-name" class="block text-sm font-medium text-gray-400 mb-1">Public Channel Name</label>
+                <input type="text" id="channel-name" class="w-full bg-gray-700 border border-gray-600 rounded-md p-2 focus:ring-2 focus:ring-cyan-500 focus:outline-none" placeholder="journey.14" value="journey.14">
+            </div>
+            <div>
+                <label for="event-name" class="block text-sm font-medium text-gray-400 mb-1">Event Name (with leading dot)</label>
+                <input type="text" id="event-name" class="w-full bg-gray-700 border border-gray-600 rounded-md p-2 focus:ring-2 focus:ring-cyan-500 focus:outline-none" placeholder=".bus.location.updated" value=".bus.location.updated">
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex space-x-4 mb-6">
+            <button id="connect-btn" class="flex-1 bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2 px-4 rounded-md transition-all">Connect & Subscribe</button>
+            <button id="disconnect-btn" class="flex-1 bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-md transition-all" disabled>Disconnect</button>
+        </div>
+
+        <!-- Log Output -->
+        <div>
+             <div class="flex justify-between items-center mb-2">
+                <h2 class="text-lg font-semibold text-gray-300">Live Log</h2>
+                <button id="clear-log-btn" class="text-sm text-gray-400 hover:text-white">Clear Log</button>
+            </div>
+            <pre id="log" class="w-full h-64 bg-gray-900 rounded-md p-4 overflow-y-auto text-sm whitespace-pre-wrap break-words"></pre>
+        </div>
+    </div>
+
+<script>
+    const connectBtn = document.getElementById('connect-btn');
+    const disconnectBtn = document.getElementById('disconnect-btn');
+    const statusIndicator = document.getElementById('status-indicator');
+    const logOutput = document.getElementById('log');
+    const clearLogBtn = document.getElementById('clear-log-btn');
+
+    let echoInstance = null;
+
+    function log(message, data = null) {
+        const time = new Date().toLocaleTimeString();
+        let logMessage = `[${time}] ${message}`;
+        if (data) {
+            logMessage += `\n${JSON.stringify(data, null, 2)}`;
+        }
+        logOutput.textContent += logMessage + '\n';
+        logOutput.scrollTop = logOutput.scrollHeight;
+    }
+
+    clearLogBtn.addEventListener('click', () => {
+        logOutput.textContent = '';
+    });
+
+    connectBtn.addEventListener('click', () => {
+        if (echoInstance) {
+            log('Already connected. Please disconnect first.');
+            return;
+        }
+
+        const reverbUrl = new URL(document.getElementById('reverb-url').value);
+        const reverbAppKey = document.getElementById('reverb-key').value;
+        const channelName = document.getElementById('channel-name').value;
+        const eventName = document.getElementById('event-name').value;
+
+        if (!reverbAppKey || !channelName || !eventName) {
+            log('❌ Error: Please fill all required fields.');
+            return;
+        }
+
+        log('🚀 Initializing Laravel Echo...');
+
+        echoInstance = new window.Echo({
+            broadcaster: 'pusher',
+            key: reverbAppKey,
+            wsHost: reverbUrl.hostname,
+            wsPort: reverbUrl.port,
+            wssPort: reverbUrl.port,
+            forceTLS: reverbUrl.protocol === 'wss:',
+            cluster: 'mt1',
+            enabledTransports: ['ws', 'wss'],
+            // Public channel-er jonno kono authorizer-er dorkar nei
+        });
+
+        log(echoInstance);
+        console.log(echoInstance);
+
+        log(`📡 Connecting to ${reverbUrl.href}...`);
+
+        echoInstance.connector.pusher.connection.bind('state_change', (states) => {
+            log(`Connection state changed: ${states.previous} -> ${states.current}`);
+            if (states.current === 'connected') {
+                statusIndicator.classList.remove('bg-red-500', 'bg-yellow-500');
+                statusIndicator.classList.add('bg-green-500');
+            } else {
+                statusIndicator.classList.remove('bg-green-500');
+                statusIndicator.classList.add('bg-red-500');
+            }
+        });
+
+        echoInstance.connector.pusher.connection.bind('error', (err) => {
+            log('❌ Connection Error!', err);
+        });
+
+        log(`👂 Subscribing to channel: ${channelName}`);
+        echoInstance.channel(channelName) // .private() er bodole .channel() bebohar kora hochche journey.15
+            .listen(eventName, (eventData) => {
+                log(`🎉 Event Received on '${eventName}'!`, eventData);
+            });
+
+        connectBtn.disabled = true;
+        disconnectBtn.disabled = false;
+    });
+
+    disconnectBtn.addEventListener('click', () => {
+        if (echoInstance) {
+            echoInstance.disconnect();
+            log('🔌 Disconnected.');
+            echoInstance = null;
+            connectBtn.disabled = false;
+            disconnectBtn.disabled = true;
+            statusIndicator.classList.remove('bg-green-500');
+            statusIndicator.classList.add('bg-red-500');
+        }
+    });
+
+</script>
+</body>
+</html>

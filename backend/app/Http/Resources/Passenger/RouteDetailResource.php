@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Resources\Passenger;
 
+use App\Http\Resources\Driver\JourneyResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Services\Passenger\RouteScheduleService;
@@ -23,6 +24,10 @@ class RouteDetailResource extends JsonResource
             'full_name' => $this->full_name,
             'google_map_link' => $this->google_map_link,
             'route_prefix' => $this->route_prefix,
+            'start_latitude' => $this->stops->first()?->latitude,
+            'start_longitude' => $this->stops->first()?->longitude,
+            'end_latitude' => $this->stops->last()?->latitude,
+            'end_longitude' => $this->stops->last()?->longitude,
             'status' => $this->status,
             'fares' => $this->fares->where('payment_method', 'Wallet')->map(function ($fare) {
                 return [
@@ -34,6 +39,8 @@ class RouteDetailResource extends JsonResource
 
             'outbound_schedule' => $schedules['outbound_schedule'],
             'inbound_schedule' => $schedules['inbound_schedule'],
+            //journeys with ongoing status
+            'ongoing_journeys' => JourneyResource::collection($this->whenLoaded('journeys')),
         ];
     }
 }

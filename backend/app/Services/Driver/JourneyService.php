@@ -50,7 +50,7 @@ class JourneyService extends BaseService
     /**
      * Starts a previously blocked journey.
      */
-    public function startJourney(Journey $journey, User $driverUser): Journey
+    public function startJourney(Journey $journey, User $driverUser, $latitude, $longitude): Journey
     {
         // Ensure the journey belongs to the current driver and is in a 'Blocked' state
         if ($journey->driver_id !== $driverUser->driver->id || $journey->status !== 'blocked') {
@@ -64,7 +64,10 @@ class JourneyService extends BaseService
         $journey->update([
             'status' => 'ongoing',
             'actual_departure_time' => Carbon::now(),
+            'current_lat' => $latitude,
+            'current_lng' => $longitude,
         ]);
+        broadcast(new BusLocationUpdated($journey->id, $latitude, $longitude));
         return $journey;
     }
 
@@ -82,6 +85,23 @@ class JourneyService extends BaseService
             'actual_arrival_time' => Carbon::now(),
         ]);
         return $journey;
+    }
+
+    //check if the driver has any ongoing journey
+    public function hasActiveJourney(User $driverUser): bool
+    {
+        return $this->hasOngoingJourney($driverUser);
+    }
+
+    /**
+     * Returns details of the driver's active journey if any, otherwise null.
+     */
+    public function getActiveJourneyDetails(User $driverUser): ?Journey
+    {
+        return Journey::where('driver_id', $driverUser->driver->id)
+                      ->where('status', 'ongoing')
+                      ->with(['trip.route.stops'])
+                      ->first();
     }
 
     /**

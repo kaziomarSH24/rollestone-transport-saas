@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Laravel Reverb Private Channel Tester</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pusher-js/8.4.0/pusher.min.js"></script>
+        <script src="https://unpkg.com/laravel-echo/dist/echo.iife.js"></script>
+    </head>
+    <body class="bg-gray-900 text-white p-6">
+        <h1 class="text-2xl font-bold mb-4">Reverb Channel Tester</h1>
+
+        <div class="space-y-3">
+            <button id="connectPublic" class="px-4 py-2 bg-green-600 rounded">
+                Connect Public Channel
+            </button>
+            <button
+                id="connectPrivateJourney"
+                class="px-4 py-2 bg-blue-600 rounded"
+            >
+                Connect Journey Private Channel
+            </button>
+        </div>
+
+        <div
+            class="mt-6 bg-gray-800 p-4 rounded h-64 overflow-y-auto"
+            id="log"
+        ></div>
+
+        <script>
+            const logBox = document.getElementById("log");
+            const log = (msg) => {
+                logBox.innerHTML += `<div class="text-sm">${msg}</div>`;
+                logBox.scrollTop = logBox.scrollHeight;
+            };
+
+            // Echo instance
+            window.Echo = new Echo({
+                broadcaster: "reverb",
+                key: "dxgjkdj8xe4hamvbfyk0", // config/reverb.php
+                wsHost: window.location.hostname,
+                wsPort: 8989,
+                forceTLS: false,
+                enabledTransports: ["ws"],
+                authEndpoint: "http://localhost:82/api/broadcasting/auth", // Laravel endpoint
+                auth: {
+                    headers: {
+                        Authorization:
+                            "Bearer 3|Zbysnl6UgtaNThy2d1esTS2Yb09jg0dCNkgu5wjw55378d7a",
+                    },
+                },
+            });
+
+            // Public channel test
+            document
+                .getElementById("connectPublic")
+                .addEventListener("click", () => {
+                    Echo.channel("public-test").listen("TestEvent", (e) => {
+                        log("📢 Public Event: " + JSON.stringify(e));
+                    });
+                    log("🔗 Trying to join public channel...");
+                });
+
+            // Private journey channel test
+            document
+                .getElementById("connectPrivateJourney")
+                .addEventListener("click", () => {
+                    const journeyId = prompt("Enter Journey ID to join:", "15");
+                    if (!journeyId) {
+                        log("❌ No Journey ID provided.");
+                        return;
+                    }
+                    Echo.private(`journey.${journeyId}`).listen(
+                        ".bus.location.updated",
+                        (e) => {
+                            log(
+                                "🚌 Bus Location Updated: " + JSON.stringify(e)
+                            );
+                        }
+                    );
+                    log(
+                        `🔗 Trying to join private channel: journey.${journeyId} ...`
+                    );
+                });
+        </script>
+    </body>
+</html>

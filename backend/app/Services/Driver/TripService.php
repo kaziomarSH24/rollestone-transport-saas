@@ -49,7 +49,9 @@ class TripService extends BaseService
     {
         $today = Carbon::today();
         $startedTripIds = Journey::whereDate('journey_date', $today)->pluck('trip_id');
-        return Trip::where('trip_number', $tripNumber)
+        return Trip::with('route.stops')
+                   // ->where('trip_date', $today)
+                    ->where('trip_number', $tripNumber)
                    ->whereNotIn('id', $startedTripIds)
                    ->where('is_active', true)
                    ->first();

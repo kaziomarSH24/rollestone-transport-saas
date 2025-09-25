@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Admin\SettingResource;
 use App\Services\Admin\SettingsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -22,7 +23,7 @@ class SettingsController extends Controller
         try {
             $settings = $this->settingsService->getSettings();
             $settings['webhook_endpoint'] = route('webhook.stripe'); // Add webhook URL to settings
-            return response_success('Settings retrieved successfully.', $settings);
+            return response_success('Settings retrieved successfully.', new SettingResource($settings));
         } catch (\Exception $e) {
             return response_error('Failed to retrieve settings: ' . $e->getMessage(), [], 500);
         }

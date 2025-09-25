@@ -23,4 +23,10 @@ class Journey extends Model
     {
         return $this->hasMany(Transaction::class);
     }
+
+    //relationship with User through Transaction
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'transactions', 'journey_id    ', 'user_id');
+    }
 }

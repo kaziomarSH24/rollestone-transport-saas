@@ -29,7 +29,8 @@ class MessageService extends BaseService
      */
     public function sendMessage(Message $message, string $recipientType): void
     {
-        $query = User::whereHas('deviceTokens');
+        // $query = User::whereHas('deviceTokens');
+        $query = User::query();
 
         switch ($recipientType) {
             case 'all':

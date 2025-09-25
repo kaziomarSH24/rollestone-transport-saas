@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services\Passenger;
 
 use App\Models\Route;
@@ -30,11 +31,19 @@ class RouteScheduleService
 
         $firstStopName = $route->stops->first()->location_name ?? 'Start';
         $lastStopName = $route->stops->last()->location_name ?? 'End';
+        $firstStopLatitude = $route->stops->first()->latitude ?? null;
+        $firstStopLongitude = $route->stops->first()->longitude ?? null;
+        $lastStopLatitude = $route->stops->last()->latitude ?? null;
+        $lastStopLongitude = $route->stops->last()->longitude ?? null;
 
 
         return [
             'route_id' => $route->id,
             'route_name' => $route->name,
+            'start_latitude' => $firstStopLatitude,
+            'start_longitude' => $firstStopLongitude,
+            'end_latitude' => $lastStopLatitude,
+            'end_longitude' => $lastStopLongitude,
             'outbound_schedule' => [
                 'direction_name' => "{$firstStopName} to {$lastStopName}",
                 'stops' => $outboundStops,
@@ -64,6 +73,8 @@ class RouteScheduleService
             $stopsData[] = [
                 'stop_name' => is_array($stop) ? $stop['location_name'] : $stop->location_name,
                 'times' => $tripTimes,
+                'latitude' => is_array($stop) ? null : $stop->latitude,
+                'longitude' => is_array($stop) ? null : $stop->longitude,
             ];
         }
         return $stopsData;

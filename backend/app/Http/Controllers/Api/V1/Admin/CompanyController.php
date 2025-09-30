@@ -62,15 +62,6 @@ class CompanyController extends BaseController
             ->setStatusCode(200);
     }
 
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
     /**
      * Store a newly created resource in storage.
      */
@@ -91,14 +82,6 @@ class CompanyController extends BaseController
             return response_error('Company not found.', [], 404);
         }
         return new CompanyResource($company);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
     }
 
     /**

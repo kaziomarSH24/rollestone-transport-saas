@@ -39,7 +39,6 @@ class WebhookController extends Controller
 
         $payload = @file_get_contents('php://input');
         $sigHeader = $request->header('Stripe-Signature');
-        // $endpointSecret = config('services.stripe.webhook_secret');
         $endpointSecret = $company->stripe_webhook_secret; // Use the company's webhook secret
         $event = null;
 
@@ -110,22 +109,6 @@ class WebhookController extends Controller
         return $user?->company;
     }
 
-    /**
-     * Handle the checkout.session.completed event for card setup.
-     */
-    // protected function handleSuccessfulCardSetup($session)
-    // {
-    //     $setupIntentId = $session->setup_intent;
-    //     $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
-    //     $setupIntent = $stripe->setupIntents->retrieve($setupIntentId);
-
-    //     $customerId = $setupIntent->customer;
-    //     $paymentMethodId = $setupIntent->payment_method;
-
-    //     // Call the service to save the payment method to our database
-    //     $this->paymentService->savePaymentMethodFromWebhook($customerId, $paymentMethodId);
-
-    // }
 
     // Link the transaction to the Payment Intent ID
     protected function linkTransactionToPaymentIntent($session)
@@ -157,26 +140,6 @@ class WebhookController extends Controller
     }
 
 
-
-
-    // Handle successful payment intents
-    //
-
-    // protected function handleSuccessfulPayment(PaymentIntent $paymentIntent)
-    // {
-    //     $transactionId = $paymentIntent->metadata->transaction_id ?? null;
-    //     $transaction = Transaction::find($transactionId);
-
-    //     if ($transaction && $transaction->status === 'pending') {
-    //         $user = $transaction->user;
-    //         $transaction->update(['status' => 'succeeded']);
-    //         $user->wallet->increment('balance', $transaction->amount);
-
-    //         if ($paymentIntent->setup_future_usage) {
-    //             $this->paymentService->savePaymentMethod($user, $paymentIntent->payment_method);
-    //         }
-    //     }
-    // }
 
     protected function handleSuccessfulPaymentSession($session, Company $company)
     {

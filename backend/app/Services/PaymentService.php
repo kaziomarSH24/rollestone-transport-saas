@@ -94,40 +94,11 @@ class PaymentService
 
         return $paymentIntent;
     }
-
+    
     /**
-     * Creates a Payment Intent that can handle both immediate payment
-     * and saving the card for future use if requested.
+     * Creates a Stripe Checkout Session for wallet top-up.
+     * If $defaultPaymentMethod is true, it charges the saved card directly instead.
      */
-    // public function createPaymentIntent(User $user, float $amount, bool $saveCard = false): PaymentIntent
-    // {
-    //     $customer = $this->getOrCreateStripeCustomer($user);
-    //     $amountInCents = round($amount * 100);
-
-    //     $transaction = $user->transactions()->create([
-    //         'company_id' => $user->company_id,
-    //         'type' => 'TopUp',
-    //         'amount' => $amount,
-    //         'status' => 'pending',
-    //     ]);
-
-    //     $paymentIntentParams = [
-    //         'customer' => $customer->id,
-    //         'amount' => $amountInCents,
-    //         'currency' => 'usd',
-    //         'metadata' => [ 'transaction_id' => $transaction->id ],
-    //     ];
-
-    //     if ($saveCard) {
-    //         $paymentIntentParams['setup_future_usage'] = 'off_session';
-    //     }
-
-    //     $paymentIntent = PaymentIntent::create($paymentIntentParams);
-    //     $transaction->update(['stripe_payment_intent_id' => $paymentIntent->id]);
-
-    //     return $paymentIntent;
-    // }
-
     public function createPaymentCheckoutSession(User $user, float $amount, bool $saveCard = false, $defaultPaymentMethod = false): CheckoutSession | PaymentIntent
     {
         $this->setStripeKeyForUser($user);
@@ -161,8 +132,8 @@ class PaymentService
             'metadata' => [
                 'transaction_id' => $transaction->id,
             ],
-            'success_url' => 'https://yourapp.com/payment/success?session_id={CHECKOUT_SESSION_ID}',
-            'cancel_url' => 'https://yourapp.com/payment/cancel',
+            'success_url' => env('STRIPE_PAYMENT_SUCCESS_URL', 'https://yourapp.com/payment/success') . '?session_id={CHECKOUT_SESSION_ID}',
+            'cancel_url' => env('STRIPE_PAYMENT_CANCEL_URL', 'https://yourapp.com/payment/cancel')
         ];
 
         // If saving the card, set up future usage for automatic top-ups

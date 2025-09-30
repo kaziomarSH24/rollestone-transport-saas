@@ -44,8 +44,6 @@ class DriverService extends BaseService
                 $data['username'] = $this->authService->generateUniqueUsername($data['name']);
             }
 
-            // dd($data);
-
             $userData = [
             'company_id' => tenant('id'),
             'name' => $data['name'],

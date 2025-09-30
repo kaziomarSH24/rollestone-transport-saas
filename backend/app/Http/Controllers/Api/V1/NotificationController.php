@@ -23,7 +23,6 @@ class NotificationController extends Controller
        }catch (\Exception $e) {
             return response()->json(['ok' => false, 'message' => 'Failed to fetch notifications: ' . $e->getMessage()], 500);
         }
-        // return NotificationResource::collection($notifications);
     }
 
 

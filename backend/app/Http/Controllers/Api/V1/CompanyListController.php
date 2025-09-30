@@ -30,8 +30,8 @@ class CompanyListController extends Controller
                 if ($company->company_logo) {
                     $company->company_logo = asset('storage/' . $company->company_logo);
                 } else {
-                    // $company->company_logo = 'https://ui-avatars.com/api/?background=random&color=ffffff&bold=true&rounded=true&size=512&format=png&name=' . urlencode($company->company_name);
-                    $company->company_logo = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQVFTdLWKt1qYfNdXPz7FnJokLDgL8l1f6LJaMBnYveRfiNrPIAzE6mw6coLIasUY1f-2Q&usqp=CAU";
+                    $company->company_logo = 'https://ui-avatars.com/api/?background=random&color=ffffff&bold=true&rounded=true&size=512&format=png&name=' . urlencode($company->company_name);
+                    // $company->company_logo = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQVFTdLWKt1qYfNdXPz7FnJokLDgL8l1f6LJaMBnYveRfiNrPIAzE6mw6coLIasUY1f-2Q&usqp=CAU";
                 }
                 return $company;
             });

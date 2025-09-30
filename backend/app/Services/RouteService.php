@@ -37,7 +37,6 @@ class RouteService extends BaseService
             'status' => $data['status'],
         ];
 
-        // Call the create method from BaseService, which now handles HasMany relations
         $route = $this->create($routeData, $relations);
 
         return $route->load(['stops', 'fares']);
@@ -57,8 +56,7 @@ class RouteService extends BaseService
             'google_map_link' => $data['google_map_link'],
             'status' => $data['status'],
         ];
-
-        //Call the update method from BaseService, which now handles HasMany relations
+        
         $route = $this->update($routeId, $routeData, $relations);
 
         return $route->load(['stops', 'fares']);

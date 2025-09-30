@@ -89,10 +89,7 @@ class DashboardService
      */
     public function getLiveDashboardData($filter = 'all')
     {
-        // 23.817190217017178, 90.41037310255314
-        // 23.773530466373803, 90.40149041636843
-        // dd( getDistance(23.81719021, 90.41037310, 23.81082853, 90.40357080) );
-
+        
         $query = Journey::query();
         if ($filter !== 'all') {
             $query->where('status', $filter);

@@ -35,13 +35,6 @@ class TripController extends Controller
         }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -66,14 +59,6 @@ class TripController extends Controller
             return response_error('Trip not found.', [], 404);
         }
         return response_success('Trip retrieved successfully.', $trip);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
     }
 
     /**

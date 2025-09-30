@@ -11,7 +11,6 @@ class RouteListService
      */
     public function getRoutesWithSummary($status): Collection
     {
-        // Eager load relationships and calculate aggregates directly from the database for best performance.
         $query = Route::query();
         if ($status !== false) {
             $query->where('status', filter_var($status, FILTER_VALIDATE_BOOLEAN));

@@ -371,18 +371,6 @@ docker exec -it bus-ticket-app php artisan migrate --seed
 docker exec -it bus-ticket-app php artisan ide-helper:generate
 ```
 
-### Testing
-```bash
-# Run PHPUnit tests
-docker exec -it bus-ticket-app php artisan test
-
-# Run specific test suite
-docker exec -it bus-ticket-app php artisan test --testsuite=Feature
-
-# Code style checking
-docker exec -it bus-ticket-app ./vendor/bin/pint
-```
-
 ### Database Management
 ```bash
 # Fresh migration (⚠️ destroys data)
@@ -462,13 +450,6 @@ php artisan view:cache
 # Enable OPcache (in custom.ini)
 opcache.enable=1
 opcache.memory_consumption=256
-```
-
-#### Database Optimizations
-```sql
--- Add indexes for frequently queried fields
-ALTER TABLE journeys ADD INDEX idx_journey_status (status);
-ALTER TABLE transactions ADD INDEX idx_transaction_date (created_at);
 ```
 
 ### Monitoring & Logs

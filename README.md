@@ -514,10 +514,6 @@ docker system prune
 - **Security**: Regular security updates and monitoring
 - **Monitoring**: Set up application and infrastructure monitoring
 
-### Contact
-- **Developer**: [Your Contact Information]
-- **Repository**: [GitHub Repository URL]
-- **Documentation**: [Additional Documentation URL]
 
 ---
 

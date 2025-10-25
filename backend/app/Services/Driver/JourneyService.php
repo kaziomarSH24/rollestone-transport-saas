@@ -111,6 +111,7 @@ class JourneyService extends BaseService
     {
         return Journey::where('driver_id', $driverUser->driver->id)
                       ->whereDate('journey_date', Carbon::today())
+                      ->orWhere('status', 'ongoing')
                       ->with(['trip.route.stops'])
                       ->latest()
                       ->get();

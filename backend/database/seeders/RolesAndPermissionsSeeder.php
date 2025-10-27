@@ -147,6 +147,7 @@ class RolesAndPermissionsSeeder extends Seeder
         $passengerRole = Role::findOrCreate('Passenger', 'web');
         $passengerRole->givePermissionTo([
             'view routes',
+            'view companies',
         ]);
 
 

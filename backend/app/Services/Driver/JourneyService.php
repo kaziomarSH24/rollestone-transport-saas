@@ -100,7 +100,7 @@ class JourneyService extends BaseService
     {
         return Journey::where('driver_id', $driverUser->driver->id)
                       ->where('status', 'ongoing')
-                      ->with(['trip.route.stops'])
+                      ->with(['trip.route.stops', 'trip.route.fares'])
                       ->first();
     }
 
@@ -112,7 +112,7 @@ class JourneyService extends BaseService
         return Journey::where('driver_id', $driverUser->driver->id)
                       ->whereDate('journey_date', Carbon::today())
                       ->orWhere('status', 'ongoing')
-                      ->with(['trip.route.stops'])
+                      ->with(['trip.route.stops', 'trip.route.fares'])
                       ->latest()
                       ->get();
     }

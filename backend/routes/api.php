@@ -49,9 +49,7 @@ Route::middleware('identify.company')->prefix('v1')->group(function () {
         //driver login
         Route::post('/driver/login', [\App\Http\Controllers\Api\V1\Driver\AuthController::class, 'login'])->name('api.v1.driver.auth.login');
     });
-});
-
-
+}); // Outputs: 10
 // **--- Protected Routes (User must be logged in) ---
 Route::middleware('auth:sanctum', 'identify.company')->prefix('v1')->group(function () {
 

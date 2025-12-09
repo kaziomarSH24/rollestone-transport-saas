@@ -27,7 +27,7 @@ services:
 
   bus-ticket-redis:
     ports:
-      - "6379:6379"
+      - "6389:6379"
 
   reverb:
     build:

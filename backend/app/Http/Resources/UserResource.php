@@ -48,7 +48,7 @@ class UserResource extends JsonResource
             ]),
             $this->mergeWhen($this->relationLoaded('transactions'), [
                 'total_trips' => $this->transactions->where('type', 'TripFare')->count(),
-                'total_spent' => abs(number_format($this->transactions->where('type', 'TripFare')->sum('amount'), 2)),
+                'total_spent' => number_format(abs($this->transactions->where('type', 'TripFare')->sum('amount')), 2),
             ]),
         ];
     }

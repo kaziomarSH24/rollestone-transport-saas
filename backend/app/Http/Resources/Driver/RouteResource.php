@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Driver;
 
+use App\Http\Resources\Admin\FareResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -24,6 +25,7 @@ class RouteResource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'stops' => StopsResource::collection($this->whenLoaded('stops')),
+            'fares' => FareResource::collection($this->whenLoaded('fares')),
         ];
     }
 }

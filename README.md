@@ -1,5 +1,6 @@
 # 🚍 Bus Ticket Management System
-
+> 📚 **Complete System Architecture & Technical Documentation:** > [👉 View / Download Rollestone 50-Page PDF Documentation](./Rollestone_Documentation.pdf)
+>
 A comprehensive multi-tenant bus ticket management system built with Laravel and Docker. This system provides complete functionality for bus companies to manage routes, trips, drivers, passengers, and real-time operations.
 
 ## 📋 Table of Contents
@@ -23,6 +24,7 @@ A comprehensive multi-tenant bus ticket management system built with Laravel and
 The Bus Ticket Management System is a modern, scalable solution for bus transportation companies. It features a multi-tenant architecture where each bus company operates independently with their own data and settings.
 
 ### Key Technologies
+
 - **Backend**: Laravel 12.x (PHP 8.2+)
 - **Database**: MySQL 8.0
 - **Cache/Queue**: Redis
@@ -35,40 +37,47 @@ The Bus Ticket Management System is a modern, scalable solution for bus transpor
 ## ✨ Features
 
 ### 🏢 Multi-Tenant Architecture
+
 - Each bus company has independent data and settings
 - Subdomain-based or company identification
 - Isolated payment configurations per company
 
 ### 👥 User Management
+
 - **Admin**: Complete system control
 - **Drivers**: Route management and passenger processing
 - **Passengers**: Mobile app functionality
 
 ### 🚌 Operations Management
+
 - **Route Management**: Create and manage bus routes with stops
 - **Trip Scheduling**: Schedule trips with departure times
 - **Real-time Tracking**: Live journey tracking and updates
 - **Driver Dashboard**: Start/end journeys, process payments
 
 ### 💳 Payment System
+
 - **Stripe Integration**: Secure payment processing
 - **Digital Wallet**: Passenger wallet system with auto top-up
 - **Multiple Payment Methods**: Card payments and cash
 - **Refund Management**: Automated refund processing
 
 ### 📱 Mobile Features
+
 - **Route Information**: View available routes and schedules
 - **Trip Alerts**: Get notifications for trip updates
 - **Payment History**: Transaction tracking
 - **Contact Support**: Built-in support system
 
 ### 📊 Analytics & Reporting
+
 - **Live Dashboard**: Real-time journey monitoring
 - **Revenue Reports**: Route-wise revenue analysis
 - **Cash Reconciliation**: Driver cash management
 - **Passenger Analytics**: Usage patterns and trends
 
 ### 🔔 Notifications
+
 - **Real-time Alerts**: Firebase push notifications
 - **Email Notifications**: Automated email system
 - **In-app Notifications**: System notifications
@@ -76,6 +85,7 @@ The Bus Ticket Management System is a modern, scalable solution for bus transpor
 ## 🖥️ System Requirements
 
 ### Production Environment
+
 - **OS**: Linux (Ubuntu 20.04+ recommended)
 - **RAM**: 4GB minimum, 8GB recommended
 - **Storage**: 20GB minimum
@@ -83,6 +93,7 @@ The Bus Ticket Management System is a modern, scalable solution for bus transpor
 - **Docker Compose**: 2.0+
 
 ### Development Environment
+
 - **OS**: Windows/macOS/Linux
 - **RAM**: 8GB minimum
 - **Docker Desktop**: Latest version
@@ -91,12 +102,14 @@ The Bus Ticket Management System is a modern, scalable solution for bus transpor
 ## 🚀 Installation & Setup
 
 ### 1. Clone the Repository
+
 ```bash
 git clone https://github.com/your-repo/bus-ticket.git
 cd bus-ticket
 ```
 
 ### 2. Environment Configuration
+
 ```bash
 # Copy environment file
 cp .env.example .env
@@ -106,6 +119,7 @@ nano .env
 ```
 
 ### 3. Configure Environment Variables
+
 Update the `.env` file with your settings:
 
 ```env
@@ -131,6 +145,7 @@ REDIS_PORT=6379
 ### 4. Build and Start Services
 
 #### For Development (with local builds):
+
 ```bash
 # Build and start all services
 docker-compose -f docker-compose.yml -f docker-compose.override.yml up -d --build
@@ -140,12 +155,14 @@ docker-compose up -d --build
 ```
 
 #### For Production (using pre-built images):
+
 ```bash
 # Start services with production images
 docker-compose -f docker-compose.yml up -d
 ```
 
 ### 5. Initialize the Application
+
 ```bash
 # Enter the application container
 docker exec -it bus-ticket-app bash
@@ -177,10 +194,12 @@ php artisan view:cache
 ## ⚙️ Configuration
 
 ### Company Setup
+
 1. **Create a Company**:
+
    ```bash
    php artisan tinker
-   
+
    Company::create([
        'company_name' => 'Your Bus Company',
        'contact_email' => 'admin@yourcompany.com',
@@ -201,12 +220,15 @@ php artisan view:cache
    ```
 
 ### Stripe Configuration
+
 Configure Stripe keys in the admin panel or directly in company settings:
+
 - **Public Key**: For frontend payment processing
 - **Secret Key**: For backend payment processing
 - **Webhook Endpoint**: `/api/v1/stripe/webhook`
 
 ### Firebase Setup
+
 1. Download Firebase service account credentials
 2. Place the JSON file in `backend/firebase-credentials.json`
 3. Configure Firebase in the admin settings
@@ -214,6 +236,7 @@ Configure Stripe keys in the admin panel or directly in company settings:
 ## 🏃 Running the Application
 
 ### Service URLs
+
 After successful setup, access these services:
 
 - **Main Application**: http://localhost:82
@@ -223,6 +246,7 @@ After successful setup, access these services:
 - **WebSocket (Reverb)**: ws://localhost:8989
 
 ### Service Management
+
 ```bash
 # Start all services
 docker-compose up -d
@@ -243,6 +267,7 @@ docker-compose ps
 ## 📡 API Documentation
 
 ### Authentication Endpoints
+
 ```
 POST /api/v1/auth/register          # User registration
 POST /api/v1/auth/login            # User login
@@ -251,6 +276,7 @@ POST /api/v1/auth/forgot-password  # Password reset
 ```
 
 ### Admin Endpoints
+
 ```
 GET  /api/v1/admin/dashboard/stats     # Dashboard statistics
 GET  /api/v1/admin/dashboard/live-data # Live journey data
@@ -261,6 +287,7 @@ CRUD /api/v1/admin/trips               # Trip management
 ```
 
 ### Driver Endpoints
+
 ```
 GET  /api/v1/driver/journeys/driver-schedule    # Driver schedule
 POST /api/v1/driver/journeys/{journey}/start    # Start journey
@@ -269,6 +296,7 @@ POST /api/v1/driver/journeys/process-payment    # Process payment
 ```
 
 ### Passenger Endpoints
+
 ```
 GET  /api/v1/passenger/routes                    # Available routes
 POST /api/v1/passenger/payment/top-up           # Wallet top-up
@@ -277,7 +305,9 @@ GET  /api/v1/passenger/alerts                   # Trip alerts
 ```
 
 ### API Authentication
+
 All protected routes require Bearer token authentication:
+
 ```bash
 curl -H "Authorization: Bearer your_token_here" \
      -H "Content-Type: application/json" \
@@ -287,6 +317,7 @@ curl -H "Authorization: Bearer your_token_here" \
 ## 🏗️ System Architecture
 
 ### Container Services
+
 1. **bus-ticket-app**: Laravel application (PHP-FPM)
 2. **backend-webserver**: Nginx web server
 3. **bus-ticket-db**: MySQL database
@@ -298,6 +329,7 @@ curl -H "Authorization: Bearer your_token_here" \
 9. **phpmyadmin**: Database administration
 
 ### Data Flow
+
 1. **Client Request** → Nginx Proxy → Backend Webserver → Laravel App
 2. **Real-time Updates** → Reverb WebSocket Server → Client
 3. **Background Jobs** → Queue Worker → Redis/Database
@@ -306,6 +338,7 @@ curl -H "Authorization: Bearer your_token_here" \
 ## 👤 User Roles & Permissions
 
 ### Admin
+
 - Complete system access
 - Company management
 - User management
@@ -314,6 +347,7 @@ curl -H "Authorization: Bearer your_token_here" \
 - Analytics and reporting
 
 ### Driver
+
 - View assigned routes
 - Start/end journeys
 - Process passenger payments
@@ -321,6 +355,7 @@ curl -H "Authorization: Bearer your_token_here" \
 - Cash reconciliation
 
 ### Passenger
+
 - View routes and schedules
 - Top-up wallet
 - View transaction history
@@ -330,6 +365,7 @@ curl -H "Authorization: Bearer your_token_here" \
 ## 🔧 Key Components
 
 ### Models
+
 - **Company**: Multi-tenant company management
 - **User**: System users (Admin, Driver, Passenger)
 - **Route**: Bus routes with stops
@@ -339,12 +375,14 @@ curl -H "Authorization: Bearer your_token_here" \
 - **PassengerWallet**: Digital wallet system
 
 ### Services
+
 - **DashboardService**: Dashboard analytics
 - **PaymentService**: Stripe payment processing
 - **NotificationService**: Push notifications
 - **JourneyService**: Trip management
 
 ### Jobs & Queues
+
 - Payment processing
 - Notification sending
 - Data synchronization
@@ -353,6 +391,7 @@ curl -H "Authorization: Bearer your_token_here" \
 ## 🔧 Development
 
 ### Local Development Setup
+
 ```bash
 # Clone and enter directory
 git clone https://github.com/your-repo/bus-ticket.git
@@ -372,6 +411,7 @@ docker exec -it bus-ticket-app php artisan ide-helper:generate
 ```
 
 ### Database Management
+
 ```bash
 # Fresh migration (⚠️ destroys data)
 docker exec -it bus-ticket-app php artisan migrate:fresh --seed
@@ -388,6 +428,7 @@ docker exec -it bus-ticket-app php artisan make:migration create_your_table
 ### Common Issues
 
 #### 1. Container Won't Start
+
 ```bash
 # Check container logs
 docker-compose logs -f bus-ticket-app
@@ -398,6 +439,7 @@ docker-compose up -d --build
 ```
 
 #### 2. Database Connection Issues
+
 ```bash
 # Verify database container is running
 docker-compose ps
@@ -411,6 +453,7 @@ DB::connection()->getPdo();
 ```
 
 #### 3. Permission Issues
+
 ```bash
 # Fix Laravel permissions
 docker exec -it bus-ticket-app chmod -R 775 storage bootstrap/cache
@@ -418,6 +461,7 @@ docker exec -it bus-ticket-app chown -R www-data:www-data storage bootstrap/cach
 ```
 
 #### 4. Queue Jobs Not Processing
+
 ```bash
 # Restart queue worker
 docker-compose restart queue-worker
@@ -427,6 +471,7 @@ docker exec -it bus-ticket-app php artisan queue:work --once
 ```
 
 #### 5. WebSocket Connection Issues
+
 ```bash
 # Check Reverb service
 docker-compose logs -f reverb
@@ -438,6 +483,7 @@ docker-compose logs -f reverb
 ### Performance Optimization
 
 #### Production Optimizations
+
 ```bash
 # Optimize autoloader
 composer install --optimize-autoloader --no-dev
@@ -455,6 +501,7 @@ opcache.memory_consumption=256
 ### Monitoring & Logs
 
 #### Application Logs
+
 ```bash
 # View Laravel logs
 docker exec -it bus-ticket-app tail -f storage/logs/laravel.log
@@ -467,6 +514,7 @@ docker-compose logs -f queue-worker
 ```
 
 #### System Monitoring
+
 ```bash
 # Check container resource usage
 docker stats
@@ -481,6 +529,7 @@ docker system prune
 ## 🆘 Support
 
 ### Getting Help
+
 1. **Documentation**: Check this README and inline code comments
 2. **Logs**: Always check application and container logs first
 3. **Issues**: Create detailed GitHub issues with:
@@ -490,11 +539,11 @@ docker system prune
    - Container logs
 
 ### Maintenance
+
 - **Backups**: Regular database and file backups
 - **Updates**: Keep Docker images and dependencies updated
 - **Security**: Regular security updates and monitoring
 - **Monitoring**: Set up application and infrastructure monitoring
-
 
 ---
 

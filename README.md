@@ -316,6 +316,8 @@ curl -H "Authorization: Bearer your_token_here" \
 
 ## 🏗️ System Architecture
 
+*For an in-depth understanding of the Data Flow Diagrams (DFD), Database Schema, and DevOps Configuration, please refer to the **[Technical Documentation PDF](./Rollestone_Documentation.pdf)**.*
+
 ### Container Services
 
 1. **bus-ticket-app**: Laravel application (PHP-FPM)

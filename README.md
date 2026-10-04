@@ -1,7 +1,8 @@
-# 🚍 Bus Ticket Management System
-> 📚 **Complete System Architecture & Technical Documentation:** > [👉 View / Download Rollestone 50-Page PDF Documentation](./Rollestone_Documentation.pdf)
+# 🚍 Rollestone — Multi-Tenant Transport SaaS Platform
+
+> 📚 **Complete System Architecture & Technical Documentation:** [👉 View / Download Rollestone 50-Page PDF Documentation](./Rollestone_Documentation.pdf)
 >
-A comprehensive multi-tenant bus ticket management system built with Laravel and Docker. This system provides complete functionality for bus companies to manage routes, trips, drivers, passengers, and real-time operations.
+> A comprehensive multi-tenant bus ticket management system built with Laravel and Docker. This system provides complete functionality for bus companies to manage routes, trips, drivers, passengers, and real-time operations.
 
 ## 📋 Table of Contents
 
@@ -104,7 +105,7 @@ The Bus Ticket Management System is a modern, scalable solution for bus transpor
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-repo/bus-ticket.git
+git clone https://github.com/kaziomarSH24/rollestone-transport-saas.git
 cd bus-ticket
 ```
 
@@ -316,7 +317,7 @@ curl -H "Authorization: Bearer your_token_here" \
 
 ## 🏗️ System Architecture
 
-*For an in-depth understanding of the Data Flow Diagrams (DFD), Database Schema, and DevOps Configuration, please refer to the **[Technical Documentation PDF](./Rollestone_Documentation.pdf)**.*
+_For an in-depth understanding of the Data Flow Diagrams (DFD), Database Schema, and DevOps Configuration, please refer to the **[Technical Documentation PDF](./Rollestone_Documentation.pdf)**._
 
 ### Container Services
 
